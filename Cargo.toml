@@ -1,0 +1,14 @@
+[package]
+name = "ep1-escalonador"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+name = "ep1_escalonador"
+path = "src/lib.rs"
+
+[[bin]]
+name = "Escalonador"
+path = "src/main.rs"
+
+[dependencies]
