@@ -1,16 +1,17 @@
 # Histórico e acompanhamento do EP1
 
-Última conferência: **2026-10-11**, base Git `05bc657`, branch `main`.
+Última conferência: **2026-10-11**, base Git `434f43b`, branch `main`.
 Estado atual: código e testes da quarta etapa registrados em `75941d0` e contextos
 em `05bc657`, integrados localmente à `main` por fast-forward autorizado de
-`94a9482`, sem push. Suíte pós-merge com 92 aprovados, zero falhas e zero ignorados.
+`94a9482`. Após autorização do usuário, a publicação em `origin/main` foi concluída
+até `434f43b`. Suíte pós-merge com 92 aprovados, zero falhas e zero ignorados.
 `executar_laco` consome os passos até a conclusão e devolve
 os registradores finais reais por PID. Revisões independentes de conformidade e
 qualidade do núcleo aprovadas sem achados; suíte com 92 aprovados, zero falhas e
 zero ignorados. As revisões documental e final desta entrega foram aprovadas em conformidade e
 qualidade, sem achados críticos, importantes ou menores.
 A terceira etapa foi registrada em `57099c4` e integrada localmente à `main`
-por fast-forward autorizado de `7ced42f`, sem push, com 77/0/0 pós-merge.
+por fast-forward autorizado de `7ced42f`, naquele momento sem push, com 77/0/0 pós-merge.
 A segunda etapa foi registrada em `8d4d172`, integrada e publicada na `main`;
 o enunciado `ep1.pdf` foi incluído como contexto em `7336c37`. Estatísticas,
 logs reais, `simular` com resumo/registro e integração de `main` continuam pendentes.
@@ -138,6 +139,7 @@ proposta de validação, não uma funcionalidade adicional prometida.
 | 2026-10-11 | Entrega sem commit sobre `94a9482` | Quarta etapa na branch `codex/etapa4-laco-simulacao`: laço completo do núcleo, mapa de registradores finais reais, TDD e revisão independente do núcleo sem achados; 92/0/0. Estatísticas, logs reais e execução principal integrada pendentes; revisões documental e final aprovadas sem achados. |
 | 2026-10-11 | `75941d0` | Código e testes do laço completo registrados após autorização de dois commits separados e revisão independente pré-commit sem achados; naquele momento, contextos em preparação para o segundo commit, sem merge ou push. |
 | 2026-10-11 | `05bc657` | Contextos da quarta etapa registrados em commit separado; após autorização do usuário, ambos os commits integrados localmente à `main` por fast-forward de `94a9482`, sem push. Suíte pós-merge aprovada com 92/0/0. |
+| 2026-10-11 | `434f43b` | Após autorização do usuário, publicação dos cinco commits locais em `origin/main` concluída, avançando a remota de `7ced42f` para `434f43b`, incluindo as etapas três e quatro. |
 
 Verificação da entrega `748077f`: `cargo check --all-targets`, `cargo fmt --check`,
 `cargo clippy --all-targets -- -D warnings` e `git diff --check` aprovados;
@@ -333,6 +335,12 @@ Após autorização do usuário, o coordenador integrou os commits `75941d0` e
 push. A suíte pós-merge executada pelo coordenador teve 92 aprovados, zero falhas
 e zero ignorados. Estatísticas, logs reais e execução principal integrada
 continuam pendentes; a integração Git não amplia esse escopo.
+
+Após autorização do usuário para finalizar com push, o envio para `origin/main`
+retornou código 0 e avançou a remota de `7ced42f` para `434f43b`, publicando os
+cinco commits locais, incluindo as etapas três e quatro. A publicação não amplia
+o escopo implementado; estatísticas, logs reais e execução principal integrada
+continuam pendentes. Não houve nova verificação de código neste registro.
 
 ## Como manter
 

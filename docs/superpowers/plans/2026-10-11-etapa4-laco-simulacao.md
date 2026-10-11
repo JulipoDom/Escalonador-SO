@@ -17,7 +17,7 @@
 - Somente std; sem CLI configurável, lote automático, CSV ou experimentos nesta entrega.
 - Preservar contratos de `executar_passo` e `executar_quantum`, modelos, filas e política.
 - Não implementar estatísticas, logs ou integração real da main. Não preencher Resumo com valores artificiais.
-- Um editor por arquivo; correções ao autor. A entrega inicial aguardou revisão humana sem stage ou commit. Em 2026-10-11, após preparar o stage, o usuário autorizou revisão e dois commits separados: código/testes e contextos/documentação. Depois autorizou o merge local com a main, realizado por fast-forward de `94a9482` para `05bc657`. Não houve push desta etapa.
+- Um editor por arquivo; correções ao autor. A entrega inicial aguardou revisão humana sem stage ou commit. Em 2026-10-11, após preparar o stage, o usuário autorizou revisão e dois commits separados: código/testes e contextos/documentação. Depois autorizou o merge local com a main, realizado por fast-forward de `94a9482` para `05bc657`, inicialmente sem push. Após autorização posterior, `origin/main` recebeu os commits locais até `434f43b`.
 
 ## Review Focus
 
@@ -74,3 +74,4 @@ Contrato:
 - [x] Registrar revisões aprovadas e entregar inicialmente sem commit para revisão humana.
 - [x] Após autorização de dois commits, revisar o stage e registrar código/testes em `75941d0`; revisão independente pré-commit sem achados de código/contratos, com 34 testes focados aprovados. Coordenador repetiu check, suíte (92/0/0), fmt, Clippy e conferências do diff, entradas, boilerplate e recusa da execução. Contextos/documentação registrados separadamente em `05bc657` após revisão independente aprovada.
 - [x] Após autorização posterior do usuário, integrar localmente à main por fast-forward de `94a9482` para `05bc657`; suíte pós-merge com 92 aprovados, zero falhas e zero ignorados. Sem push.
+- [x] Após novo pedido do usuário, publicar os commits locais em `origin/main`: push concluído de `7ced42f` para `434f43b`, incluindo código e contextos da etapa4 e o registro da integração.
