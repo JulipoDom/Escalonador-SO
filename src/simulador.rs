@@ -1,21 +1,34 @@
-//! Contratos reservados de despacho, quantum e passagem do tempo lógico.
+//! Execução de quantum e contrato reservado de simulação e tempo lógico.
 use crate::{
     erros::ErroEp,
-    modelos::{Bcp, ResultadoQuantum, ResultadoSimulacao},
+    interpretador::executar_instrucao,
+    modelos::{Bcp, MotivoParada, ResultadoQuantum, ResultadoSimulacao},
     registro::RegistroLog,
 };
 
-/// Executará no máximo `quantum` instruções, parando antes por E/S ou SAIDA.
+/// Executa no máximo `quantum` instruções, parando antes por E/S ou SAIDA.
 /// E/S e SAIDA contam na quantidade executada e avançam o PC uma única vez.
-/// O quantum deve ser positivo; sua validação faz parte do núcleo pendente.
-/// O crédito será descontado uma vez por despacho pelo laço de simulação,
-/// nunca por instrução ou por esta função. O BCP continuará pertencendo à
-/// tabela durante a execução, acessado por um empréstimo mutável curto.
-/// Nesta base retorna erro sem consumir instruções nem modificar o contexto.
-pub fn executar_quantum(_bcp: &mut Bcp, _quantum: usize) -> Result<ResultadoQuantum, ErroEp> {
-    Err(ErroEp::NaoImplementado(
-        "execução do quantum com contagem de instruções e parada por E/S ou SAIDA",
-    ))
+/// Quantum zero retorna erro de entrada sem modificar o contexto. Erros de
+/// instrução são propagados, preservando o progresso das instruções válidas.
+/// Preserva créditos, estado e espera: as transições cabem ao laço de simulação.
+pub fn executar_quantum(bcp: &mut Bcp, quantum: usize) -> Result<ResultadoQuantum, ErroEp> {
+    if quantum == 0 {
+        return Err(ErroEp::Entrada("quantum deve ser positivo".into()));
+    }
+    for executadas in 0..quantum {
+        if let Some(motivo) = executar_instrucao(bcp)? {
+            return Ok(ResultadoQuantum {
+                pid: bcp.pid,
+                instrucoes_executadas: executadas + 1,
+                motivo,
+            });
+        }
+    }
+    Ok(ResultadoQuantum {
+        pid: bcp.pid,
+        instrucoes_executadas: quantum,
+        motivo: MotivoParada::Quantum,
+    })
 }
 
 /// Coordenará a tabela proprietária de todos os BCPs ativos e filas de IDs.

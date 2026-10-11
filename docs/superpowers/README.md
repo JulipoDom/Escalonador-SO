@@ -1,6 +1,8 @@
 # Superpowers no contexto atual
 
-O [plano vigente](plans/2026-10-10-contexto-atual.md) organiza o método de trabalho e as próximas etapas propostas. Ele não autoriza implementar o núcleo agora.
+O [contexto vigente](plans/2026-10-10-contexto-atual.md) organiza o método de trabalho e as próximas etapas propostas. O [plano da primeira etapa](plans/2026-10-10-etapa1-interpretador-quantum.md) registra o recorte autorizado de interpretador e quantum, implementado com TDD e revisão independente. Filas e política são o próximo passo proposto; o restante do núcleo exige nova autorização.
+
+O [enunciado de 2026](../../ep1.pdf) está na raiz do projeto. A execução integrada continua recusando a simulação pendente e não produz logs ou medições.
 
 Consulte o [AGENTS.md](../../AGENTS.md) para as instruções atuais de desenvolvimento e o [HISTORICO.md](../../HISTORICO.md) para o estado, as decisões e as pendências. Essas são as fontes atuais; prevalecem sobre o acervo abaixo.
 

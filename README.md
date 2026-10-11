@@ -4,9 +4,9 @@ Base do EP1 de Sistemas Operacionais de 2026 em Rust stable, edição 2021, com 
 
 Estado, decisões e próximos passos: [Histórico do projeto](HISTORICO.md).
 
-Fluxo de desenvolvimento com Superpowers: [instruções](AGENTS.md), [plano vigente](docs/superpowers/plans/2026-10-10-contexto-atual.md) e [registros históricos](docs/superpowers/README.md).
+Fluxo de desenvolvimento com Superpowers: [instruções](AGENTS.md), [contexto vigente](docs/superpowers/plans/2026-10-10-contexto-atual.md), [plano da primeira etapa](docs/superpowers/plans/2026-10-10-etapa1-interpretador-quantum.md) e [índice e acervo](docs/superpowers/README.md).
 
-Execute na raiz deste projeto (`ep1-escalonador/`), onde está `programas/`:
+Execute na raiz deste projeto, onde estão `programas/` e o [enunciado de 2026](ep1.pdf):
 
 ```bash
 cargo run --bin Escalonador
@@ -17,9 +17,13 @@ cargo fmt --check
 
 Opcionalmente, compile com `cargo build --release --bin Escalonador` e execute `./target/release/Escalonador` no mesmo diretório. A entrada vem exclusivamente de `programas/`, incluindo prioridades e quantum.
 
-Modelos, carregamento e validação das entradas, tabela de processos e escrita dos eventos de log estão implementados. Interpretador, política de escalonamento, controle de E/S, simulação e cálculo das estatísticas permanecem pendentes. A execução valida a entrada e retorna `ErroEp::NaoImplementado`, com código diferente de zero e sem criar logs. Os testes de contratos pendentes verificam essa recusa, sem comprovar o funcionamento do núcleo.
+Modelos, carregamento e validação das entradas, tabela de processos e escrita dos eventos fornecidos estão implementados. A primeira etapa implementa `executar_instrucao` e `executar_quantum` sobre um BCP: atribuições, COM, E/S e SAIDA avançam o PC uma vez; E/S e SAIDA interrompem e contam na execução, inclusive na fronteira do quantum. A retomada começa na instrução seguinte, preservando registradores e os demais campos do BCP.
 
-Convenções para implementar o núcleo conforme `../ep1.pdf` de 2026:
+PC fora do texto retorna `EstadoInvalido` sem mutação da instrução inválida. Quantum zero retorna `Entrada` antes de consultar o PC e sem modificar o BCP; um erro após instruções válidas preserva o progresso já executado. Estado, créditos e espera não são alterados pelo interpretador ou quantum.
+
+Filas e política são o primeiro próximo passo proposto. Controle de E/S, laço de simulação, estatísticas e integração da execução permanecem pendentes com `ErroEp::NaoImplementado` específico. A execução valida a entrada e encerra com código 1, sem criar logs. Os testes dos contratos pendentes verificam essa recusa; a execução de quantum isolada não comprova a simulação completa.
+
+Convenções para as etapas restantes conforme o [enunciado de 2026](ep1.pdf):
 
 - A tabela possui os BCPs; filas guardam somente `ProcessId`. Toda instrução, inclusive E/S e SAIDA, consome uma unidade e avança o PC uma vez; E/S retoma na seguinte.
 - Créditos começam na prioridade; escolher o maior crédito pronto e descontar um por despacho, sem ficar negativo. Redistribuir as prioridades somente quando todos os ativos, inclusive bloqueados, têm zero. Terminados não participam.
