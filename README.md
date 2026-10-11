@@ -4,6 +4,8 @@ Base do EP1 de Sistemas Operacionais de 2026 em Rust stable, edição 2021, com 
 
 Estado, decisões e próximos passos: [Histórico do projeto](HISTORICO.md).
 
+Fluxo de desenvolvimento com Superpowers: [instruções](AGENTS.md), [plano vigente](docs/superpowers/plans/2026-10-10-contexto-atual.md) e [registros históricos](docs/superpowers/README.md).
+
 Execute na raiz deste projeto (`ep1-escalonador/`), onde está `programas/`:
 
 ```bash

@@ -1,7 +1,8 @@
 # Histórico e acompanhamento do EP1
 
-Última conferência: **2026-10-10**, fontes e README na base Git `ffc8849`.
-Esta entrega acrescenta o acompanhamento documental à base indicada acima.
+Última conferência: **2026-10-10**, fontes na base Git `748077f`.
+Trabalho atual: recuperação dos documentos Superpowers de `58835cb` e adaptação
+do fluxo à base atual, com plano vigente separado do acervo histórico.
 
 ## Objetivo e escopo
 
@@ -40,6 +41,9 @@ verificam a recusa; não demonstram que a simulação funciona.
   Ociosidade avança somente a espera lógica, sem instruções, créditos ou despachos.
 - Manter o escopo essencial: sem CLI configurável, lote automático, CSV, threads,
   tempo real, `unsafe`, resultados experimentais inventados ou relatório fictício.
+- Usar o fluxo Superpowers detalhado no AGENTS. Plano e registros recuperados
+  de `58835cb` são históricos; o plano `docs/superpowers/plans/2026-10-10-contexto-atual.md`
+  orienta as próximas entregas, sem autorizar antecipadamente a implementação do núcleo.
 
 ## Sequência proposta de implementação e verificação
 
@@ -68,11 +72,18 @@ proposta de validação, não uma funcionalidade adicional prometida.
 | 2026-10-10 | `189b01d` | Base inicial do projeto. |
 | 2026-10-10 | `58835cb` | Revisão da propagação de erros de saída e registro da verificação da base. |
 | 2026-10-10 | `ffc8849` | Simplificação para a base essencial do EP1; núcleo permanece reservado. |
-| 2026-10-10 | Entrega documental sobre `ffc8849` | Criação deste acompanhamento, link no README e regra de manutenção no AGENTS. |
+| 2026-10-10 | `748077f` | Criação deste acompanhamento, link no README e regra de manutenção no AGENTS. |
+| 2026-10-10 | Entrega sobre `748077f` | Recuperação do acervo Superpowers de `58835cb`, fluxo detalhado no AGENTS e plano adaptado ao contexto atual. |
 
-Verificação desta entrega: `cargo check --all-targets`, `cargo fmt --check`,
+Verificação da entrega `748077f`: `cargo check --all-targets`, `cargo fmt --check`,
 `cargo clippy --all-targets -- -D warnings` e `git diff --check` aprovados;
 `cargo test` com 28 aprovados, zero falhas e zero ignorados.
+
+Verificação da adaptação Superpowers: check, test (28 aprovados, zero falhas e
+zero ignorados), fmt e Clippy novamente aprovados. Execução com entradas oficiais
+retornou código 1 e pendência explícita, sem logs; os 12 arquivos conferem com o ZIP.
+Os 11 documentos recuperados conferem byte a byte com `58835cb`; links novos
+válidos e `git diff --check` aprovado. Código e entradas permanecem inalterados.
 
 ## Como manter
 
