@@ -181,3 +181,39 @@ fn preserva_caminhos_nao_utf8() {
     assert!(o.status.success(), "{}", text(&o.stderr));
     assert!(text(&o.stdout).contains("PEQUENO"));
 }
+
+#[cfg(target_os = "linux")]
+fn assert_saida_cheia(args: &[&OsStr]) {
+    let o = Command::new(env!("CARGO_BIN_EXE_Escalonador"))
+        .args(args)
+        .stdout(
+            fs::OpenOptions::new()
+                .write(true)
+                .open("/dev/full")
+                .unwrap(),
+        )
+        .output()
+        .unwrap();
+    assert_eq!(o.status.code(), Some(1), "{}", text(&o.stderr));
+    assert!(
+        text(&o.stderr).contains("Erro de E/S"),
+        "{}",
+        text(&o.stderr)
+    );
+    assert!(!text(&o.stderr).contains("panicked"));
+}
+#[cfg(target_os = "linux")]
+#[test]
+fn ajuda_propaga_falha_de_stdout_sem_panic() {
+    assert_saida_cheia(&[OsStr::new("--help")]);
+}
+#[cfg(target_os = "linux")]
+#[test]
+fn validacao_propaga_falha_de_stdout_sem_panic() {
+    let p = Path::new(env!("CARGO_MANIFEST_DIR")).join("programas");
+    assert_saida_cheia(&[
+        OsStr::new("--validar"),
+        OsStr::new("--programas"),
+        p.as_os_str(),
+    ]);
+}

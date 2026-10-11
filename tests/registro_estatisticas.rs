@@ -140,7 +140,7 @@ fn metricas_e_lote_permanecem_pendentes_sem_criar_destino() {
         motivo: MotivoParada::Quantum,
     };
     assert!(matches!(
-        Estatisticas::default().registrar(&q),
+        Estatisticas.registrar(&q),
         Err(ErroEp::NaoImplementado(
             "coleta de despachos e instruções executadas"
         ))

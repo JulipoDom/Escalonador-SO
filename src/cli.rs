@@ -6,6 +6,7 @@ use crate::{
 };
 use std::{
     ffi::{OsStr, OsString},
+    io::Write,
     path::PathBuf,
 };
 
@@ -79,7 +80,9 @@ pub fn executar(args: impl Iterator<Item = OsString>) -> Result<(), ErroEp> {
         return Err(entrada("--validar e --quanta são mutuamente exclusivos"));
     }
     if ajuda {
-        print!("{AJUDA}");
+        let mut stdout = std::io::stdout().lock();
+        write!(stdout, "{AJUDA}")?;
+        stdout.flush()?;
         return Ok(());
     }
     let diretorio = match programas {
@@ -111,19 +114,23 @@ pub fn executar(args: impl Iterator<Item = OsString>) -> Result<(), ErroEp> {
     }
     let quantum = ler_quantum(&diretorio)?;
     if validar {
+        let mut stdout = std::io::stdout().lock();
         let mut total = 0;
         for bcp in &processos {
             let n = bcp.programa.instrucoes.len();
             total += n;
-            println!(
+            writeln!(
+                stdout,
                 "{}: prioridade {}, instruções {}",
                 bcp.programa.nome, bcp.prioridade, n
-            );
+            )?;
         }
-        println!(
+        writeln!(
+            stdout,
             "quantum: {quantum}\nTotal: {} processos, {total} instruções",
             processos.len()
-        );
+        )?;
+        stdout.flush()?;
         return Ok(());
     }
     let _destino = saida.unwrap_or_else(|| raiz.to_path_buf());

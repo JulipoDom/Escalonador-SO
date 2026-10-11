@@ -11,3 +11,5 @@ Evidência TDD: após skeleton compilável, cargo test --test registro_estatisti
 Primeira tentativa de cargo test global foi bloqueada por E0432 em tests/simulador.rs: executar_instrucao, executar_quantum e simular ainda ausentes nos módulos em edição concorrente; também apareceu unused_parens no teste do simulador. O coordenador foi avisado para verificar novamente após integração. Uma tentativa inicial local usou a raiz superior sem Cargo.toml e foi corrigida para o diretório do pacote antes da evidência RED acima.
 
 Pendências: contadores e cálculo de médias; simulações independentes, CSV e análise experimental; integração de eventos com o núcleo. Formatação realizada somente nos quatro arquivos Rust deste domínio.
+
+Correção após revisão final: consultada receiving-code-review; confirmado que Estatisticas é uma unit struct. O teste passou a usar Estatisticas.registrar(&q), evitando clippy::default_constructed_unit_structs sem supressão nem alteração de comportamento. Verificações após a mudança: cargo test --test registro_estatisticas, 6 aprovados, 0 falhas e 0 ignorados; cargo clippy --all-targets -- -D warnings concluído com código 0, sem avisos.

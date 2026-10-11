@@ -38,7 +38,7 @@ cargo run --bin Escalonador -- --quanta 1 3 5 7 9 11 13 15 17 19 21 --saida resu
 
 O binário compilado dispensa Cargo no destino, respeitada a compatibilidade do sistema. No Windows, o caminho é `target\release\Escalonador.exe`.
 
-Sem `--programas`, a busca tenta `programas/` ao lado do executável e depois no diretório atual. Se não encontrar, informe `--programas CAMINHO`. Caminhos explícitos relativos usam o diretório atual. Na execução individual, o destino padrão é a pasta pai do diretório de programas; `--saida` indica a pasta do log. No lote, `--saida` indica a raiz de `logs/` e `tabelas/`; o padrão é `resultados/` na raiz identificada. `--quanta` substitui o quantum somente no lote, sem editar a entrada. `--validar` e `--quanta` são incompatíveis. Opções desconhecidas, valores inválidos e argumentos ausentes são erros.
+Sem `--programas`, a busca tenta `programas/` ao lado do executável e depois no diretório atual. Se não encontrar, informe `--programas CAMINHO`. Caminhos explícitos relativos usam o diretório atual. Na execução individual, o destino padrão é a pasta pai do diretório de programas; `--saida` indica a pasta do log. No lote, `--saida` indica a raiz de `logs/` e `tabelas/`; o padrão é `resultados/` na raiz identificada. `--quanta` substitui o quantum somente no lote, sem editar a entrada. `--validar` e `--quanta` são incompatíveis. Opções desconhecidas, valores inválidos e argumentos ausentes são erros. Repetir uma opção de caminho ou a lista de quanta com valores diferentes também é erro. No lote, os quanta informados dispensam a leitura de `quantum.txt`.
 
 ## Estrutura e estado por módulo
 
