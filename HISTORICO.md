@@ -1,9 +1,11 @@
 # Histórico e acompanhamento do EP1
 
-Última conferência: **2026-10-11**, base Git `8d4d172` na `main`.
+Última conferência: **2026-10-11**, base Git `888a1f8` na `main`.
 Estado atual: segunda etapa de filas, política de créditos e operações de espera
 de E/S registrada no commit `8d4d172` e integrada localmente à `main` por
-fast-forward em 2026-10-11, sem push. Verificações e revisão independente
+fast-forward em 2026-10-11. O usuário autorizou incluir `ep1.pdf` como contexto
+do projeto e enviar os commits locais para `origin/main`; envio ainda não registrado
+como realizado. Verificações e revisão independente
 pré-commit aprovadas; suíte pós-merge com 59 aprovados, zero falhas e zero
 ignorados. Integração ao laço de simulação continua pendente.
 
@@ -98,6 +100,7 @@ proposta de validação, não uma funcionalidade adicional prometida.
 | 2026-10-10 | Entrega sem commit sobre `7b92a6a` | Segunda etapa na branch `codex/etapa2-filas-politica`: filas, política de créditos e operações de espera de E/S com TDD real e revisão independente; integração ao laço pendente. |
 | 2026-10-11 | Trabalho sobre `7b92a6a` | Revisão pré-commit, stage e commit da segunda etapa autorizados na branch atual, condicionados à conferência do conjunto. Boilerplate local excluído do rastreio Git e protegido por regra em `.gitignore`; verificações de código e revisão independente pré-commit aprovadas. |
 | 2026-10-11 | `8d4d172` | Segunda etapa registrada após revisão e conferência do stage, integrada localmente à `main` por fast-forward autorizado, sem push; suíte pós-merge aprovada com 59/0/0. |
+| 2026-10-11 | Entrega sobre `888a1f8` | Inclusão do enunciado `ep1.pdf` de 2026 como contexto do projeto, preservado byte a byte, e publicação dos commits locais em `origin/main` autorizadas pelo usuário; envio ainda não registrado como realizado. |
 
 Verificação da entrega `748077f`: `cargo check --all-targets`, `cargo fmt --check`,
 `cargo clippy --all-targets -- -D warnings` e `git diff --check` aprovados;
@@ -181,6 +184,13 @@ Após autorização do usuário, o coordenador integrou a segunda etapa localmen
 à `main` por fast-forward de `7b92a6a` para `8d4d172`, sem push. A suíte executada
 após o merge teve 59 aprovados, zero falhas e zero ignorados. Não houve nova
 implementação; transições e laço de simulação permanecem pendentes.
+
+Na entrega sobre `888a1f8`, o usuário autorizou versionar `ep1.pdf`, o enunciado
+de 2026 usado como contexto do projeto, preservando seu conteúdo byte a byte.
+Também autorizou enviar os commits locais para `origin/main` após essa inclusão.
+Esse PDF é o enunciado existente; o relatório do trabalho continua pendente.
+A autorização de publicação não é um registro de envio realizado, e nenhum hash
+do commit de inclusão do PDF é antecipado.
 
 ## Como manter
 
