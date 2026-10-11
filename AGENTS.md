@@ -1,26 +1,11 @@
-# Trabalho neste projeto
+# Desenvolvimento
 
-Este projeto usa Rust com Cargo, múltiplos agentes especializados e skills Superpowers por padrão. O agente principal coordena e integra; especialistas executam tarefas delimitadas e um agente distinto revisa o resultado. Antes de agir, consulte as skills aplicáveis e `../BOILERPLATE_EP1_ESCALONADOR.md`. Use planejamento, desenvolvimento orientado a testes quando aplicável, depuração sistemática, revisão de código e verificação antes de concluir. Paralelize somente trabalhos independentes e mantenha um editor por arquivo. Preserve os programas oficiais e o escopo autorizado: criar a base não significa implementar o núcleo reservado nem produzir resultados experimentais. Não peça novamente ao usuário para escolher entre execução individual e multiagente. Informe indisponibilidade real de ferramentas ou skills; nunca simule seu uso.
+Rust stable, edição 2021, Cargo e somente std. O pedido atual é manter apenas a base necessária ao EP1 de 2026; ele substitui as opções e ferramentas extras do boilerplate original. Consulte `../ep1.pdf` para os requisitos e o README para o estado atual.
 
-## Responsabilidade exclusiva
+Use múltiplos agentes especializados e Superpowers: planejamento proporcional, execução delegada, TDD para comportamentos implementados, depuração sistemática, revisão independente e verificação antes de concluir. Leia as skills antes de aplicá-las; informe limitações reais. O coordenador integra; um único agente edita cada arquivo e correções retornam ao autor. Paralelize somente tarefas independentes.
 
-- Coordenador: Cargo.toml, Cargo.lock, src/lib.rs, .gitignore, AGENTS.md, plano e registro do fluxo.
-- Requisitos: somente leitura das fontes de 2026 e ZIP.
-- Modelos Rust: src/modelos.rs, src/erros.rs, tests/modelos.rs.
-- Parsing: src/carregador.rs, tests/carregador.rs.
-- Filas: src/tabela_processos.rs, src/filas.rs, src/politica.rs, tests/politica.rs.
-- CPU e E/S: src/interpretador.rs, src/simulador.rs, tests/simulador.rs.
-- Logs e métricas: src/registro.rs, src/estatisticas.rs, src/experimentos.rs, tests/registro_estatisticas.rs.
-- CLI: src/cli.rs, src/main.rs, tests/cli.rs.
-- Documentação: README.md, docs/decisoes.md, tests/fixtures/README.md, relatorio/roteiro.md.
-- Revisor independente: somente leitura e achados; correções voltam ao autor.
+Responsáveis: execução (`main.rs`, testes de execução); entrada/modelos (carregador, modelos, erros e respectivos testes); núcleo (tabela, filas, política, interpretador, simulador e testes); saída (registro, estatísticas e testes); documentação (README). Coordenador mantém Cargo, lib.rs e este arquivo; revisão independente é somente leitura.
 
-## Fluxo e evidências
+Preserve os 12 arquivos oficiais byte a byte. A tabela possui os BCPs; filas guardam somente ProcessId. Sem unsafe, threads, tempo real ou ownership compartilhado desnecessário. O núcleo continua reservado com ErroEp::NaoImplementado específico; não implementar simulador completo sem pedido nem produzir logs ou medições fictícios. Sem CLI configurável, lote automático ou CSV.
 
-Consultar using-superpowers; writing-plans antes do código; subagent-driven-development na execução e dispatching-parallel-agents para tarefas independentes. Usar test-driven-development para comportamento implementado, systematic-debugging diante de falha, requesting-code-review/receiving-code-review e verification-before-completion. Brainstorming só para decisões abertas; Rust, arquitetura aprovada e multiagentes já foram definidos pelo usuário.
-
-Modelos precedem consumidores; CLI integra após APIs disponíveis. Até três especialistas simultâneos mais coordenador, em ondas. Não mudar contratos compartilhados sem coordenação. Sem formatação global durante edições. Verificações finais serializadas: cargo check --all-targets, cargo test, cargo fmt --check, --help e --validar. Distinguir aprovados, ignorados e não executados.
-
-A tabela possui BCPs, filas somente ProcessId. Sem unsafe, threads, tempo real ou ownership compartilhado desnecessário. Núcleo reservado retorna ErroEp::NaoImplementado com descrição específica, sem sucesso vazio. Não fabricar logs, CSV ou relatório experimental.
-
-Workspace inicial sem Git: sem worktrees, commits ou scripts Superpowers dependentes de Git. Fluxo adaptado com plano e evidências em docs/fluxo; não criar repositório sem necessidade. Pedido explícito de execução e paralelismo prevalece sobre novas confirmações e serialização das skills.
+Após cessarem edições, execute cargo check --all-targets, cargo test, cargo fmt --check e Clippy quando disponível. Confira erro explícito da execução enquanto o núcleo estiver pendente, ausência de resultados fictícios e preservação das entradas. Informe aprovados, falhas e ignorados; não confunda testes de contratos pendentes com simulação implementada.

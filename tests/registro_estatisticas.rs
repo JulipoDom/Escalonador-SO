@@ -1,7 +1,6 @@
 use ep1_escalonador::{
     erros::ErroEp,
     estatisticas::{calcular_resumo, Estatisticas},
-    experimentos::executar_experimentos,
     modelos::{MotivoParada, ProcessId, ResultadoQuantum, Resumo},
     registro::{EventoLog, RegistroLog},
 };
@@ -127,9 +126,7 @@ fn falha_de_flush_e_propagada() {
     assert!(matches!(log.finalizar(), Err(ErroEp::Io(_))));
 }
 #[test]
-fn metricas_e_lote_permanecem_pendentes_sem_criar_destino() {
-    let tmp = Temporario::novo();
-    let destino = tmp.0.join("ausente");
+fn metricas_permanecem_pendentes() {
     assert!(matches!(
         calcular_resumo(3, 2, 15, 6),
         Err(ErroEp::NaoImplementado("cálculo das médias D/P e I/D"))
@@ -145,11 +142,4 @@ fn metricas_e_lote_permanecem_pendentes_sem_criar_destino() {
             "coleta de despachos e instruções executadas"
         ))
     ));
-    assert!(matches!(
-        executar_experimentos(&tmp.0, &[1, 3], &destino),
-        Err(ErroEp::NaoImplementado(
-            "execuções independentes por quantum e exportação CSV"
-        ))
-    ));
-    assert!(!destino.exists());
 }
