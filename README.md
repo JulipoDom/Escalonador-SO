@@ -29,7 +29,7 @@ As operações de E/S também estão implementadas: bloquear exige Executando, d
 
 `executar_laco` completa a quarta etapa do núcleo: prepara a tabela proprietária e as filas, consome `executar_passo` até a conclusão e devolve os registradores finais reais em `HashMap<ProcessId, (i64, i64)>`. Com quantum positivo e entrada vazia, devolve mapa vazio; quantum zero é recusado antes da preparação. Surtos e ociosidade prosseguem sem limite artificial, e erros são propagados. Quinze testes novos cobrem casos calculados à mão e uma execução das entradas oficiais, incluindo registradores prévios, E/S consecutivas, prioridades zero e erros após progresso.
 
-O código e os testes da quarta etapa foram registrados em `75941d0` (`feat: implement complete core simulation loop`). Os contextos desta entrega estão em preparação para um segundo commit autorizado, na branch `codex/etapa4-laco-simulacao`, sem merge ou push.
+O código e os testes da quarta etapa foram registrados em `75941d0` (`feat: implement complete core simulation loop`). Os contextos foram registrados em `05bc657`; ambos os commits foram integrados localmente à `main` por fast-forward autorizado de `94a9482`, sem push. A suíte pós-merge teve 92 aprovados, zero falhas e zero ignorados.
 
 `simular`, que inclui resumo e registro, permanece reservado à integração com estatísticas e logs reais, com `ErroEp::NaoImplementado` específico. A execução principal ainda não chama `executar_laco`: valida a entrada e encerra com código 1, stdout vazio e `Não implementado: integração da simulação com estatísticas e logs`, sem criar logs. Os testes dos contratos pendentes verificam essa recusa; os testes do laço comprovam o núcleo até a conclusão, sem comprovar a integração de saída.
 

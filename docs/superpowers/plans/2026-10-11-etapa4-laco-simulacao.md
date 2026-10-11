@@ -17,7 +17,7 @@
 - Somente std; sem CLI configurável, lote automático, CSV ou experimentos nesta entrega.
 - Preservar contratos de `executar_passo` e `executar_quantum`, modelos, filas e política.
 - Não implementar estatísticas, logs ou integração real da main. Não preencher Resumo com valores artificiais.
-- Um editor por arquivo; correções ao autor. A entrega inicial aguardou revisão humana sem stage ou commit. Em 2026-10-11, após preparar o stage, o usuário autorizou revisão e dois commits separados: código/testes e contextos/documentação. Merge e push continuam sem autorização nesta etapa.
+- Um editor por arquivo; correções ao autor. A entrega inicial aguardou revisão humana sem stage ou commit. Em 2026-10-11, após preparar o stage, o usuário autorizou revisão e dois commits separados: código/testes e contextos/documentação. Depois autorizou o merge local com a main, realizado por fast-forward de `94a9482` para `05bc657`. Não houve push desta etapa.
 
 ## Review Focus
 
@@ -62,7 +62,7 @@ Contrato:
 **Files:** editor único README.md, HISTORICO.md, docs/superpowers/README.md, docs/superpowers/plans/2026-10-10-contexto-atual.md. Coordenador mantém AGENTS e este plano.
 
 - [x] Registrar laço completo do núcleo implementado e mapa de registradores, diferenciando `executar_laco` de `simular` com resumo/registro ainda reservado e main pendente.
-- [x] Próximo recorte: estatísticas e logs reais, depois main integrada, depois experimentos/relatório. Etapa3 commit `57099c4` integrada localmente à main; código/testes da etapa4 registrado em `75941d0` sobre `94a9482`, na branch `codex/etapa4-laco-simulacao`.
+- [x] Próximo recorte: estatísticas e logs reais, depois main integrada, depois experimentos/relatório. Etapa3 commit `57099c4` integrada localmente à main; código/testes da etapa4 registrado em `75941d0` e contextos em `05bc657`, desenvolvidos na branch `codex/etapa4-laco-simulacao` e integrados localmente à main.
 - [x] Atualizar histórico com marco de 2026-10-11, decisões e evidências reais fornecidas pelo coordenador; não antecipar hashes/revisões ou resultados. Preservar acervo.
 - [x] Conferir links e diff check; relatório task-3-report.md.
 
@@ -72,4 +72,5 @@ Contrato:
 - [x] Após cessarem edições: cargo check --all-targets, cargo test, cargo fmt --check, cargo clippy --all-targets -- -D warnings e git diff --check; registrar aprovados/falhas/ignorados.
 - [x] Conferir main código1/erro atualizado/sem logs, preservação dos 12 oficiais/PDF/acervo/boilerplate, ausência de estatísticas fictícias e contratos externos intactos.
 - [x] Registrar revisões aprovadas e entregar inicialmente sem commit para revisão humana.
-- [x] Após autorização de dois commits, revisar o stage e registrar código/testes em `75941d0`; revisão independente pré-commit sem achados de código/contratos, com 34 testes focados aprovados. Coordenador repetiu check, suíte (92/0/0), fmt, Clippy e conferências do diff, entradas, boilerplate e recusa da execução. Contextos/documentação preparados separadamente nesta entrega.
+- [x] Após autorização de dois commits, revisar o stage e registrar código/testes em `75941d0`; revisão independente pré-commit sem achados de código/contratos, com 34 testes focados aprovados. Coordenador repetiu check, suíte (92/0/0), fmt, Clippy e conferências do diff, entradas, boilerplate e recusa da execução. Contextos/documentação registrados separadamente em `05bc657` após revisão independente aprovada.
+- [x] Após autorização posterior do usuário, integrar localmente à main por fast-forward de `94a9482` para `05bc657`; suíte pós-merge com 92 aprovados, zero falhas e zero ignorados. Sem push.

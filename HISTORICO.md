@@ -1,9 +1,10 @@
 # Histórico e acompanhamento do EP1
 
-Última conferência: **2026-10-11**, base Git `75941d0`, branch `codex/etapa4-laco-simulacao`.
-Estado atual: código e testes da quarta etapa registrados no commit `75941d0`;
-contextos desta entrega em preparação para um segundo commit autorizado, sem
-merge ou push. `executar_laco` consome os passos até a conclusão e devolve
+Última conferência: **2026-10-11**, base Git `05bc657`, branch `main`.
+Estado atual: código e testes da quarta etapa registrados em `75941d0` e contextos
+em `05bc657`, integrados localmente à `main` por fast-forward autorizado de
+`94a9482`, sem push. Suíte pós-merge com 92 aprovados, zero falhas e zero ignorados.
+`executar_laco` consome os passos até a conclusão e devolve
 os registradores finais reais por PID. Revisões independentes de conformidade e
 qualidade do núcleo aprovadas sem achados; suíte com 92 aprovados, zero falhas e
 zero ignorados. As revisões documental e final desta entrega foram aprovadas em conformidade e
@@ -135,7 +136,8 @@ proposta de validação, não uma funcionalidade adicional prometida.
 | 2026-10-11 | Trabalho sobre `7ced42f` | Usuário colocou a terceira etapa em stage e autorizou revisão pré-commit e commit se o conjunto estiver correto; conferência aprovada sem achados, sem pedido de push ou merge. |
 | 2026-10-11 | `57099c4` | Terceira etapa registrada e integrada localmente à `main` por fast-forward autorizado de `7ced42f`, sem push; suíte pós-merge aprovada com 77/0/0. |
 | 2026-10-11 | Entrega sem commit sobre `94a9482` | Quarta etapa na branch `codex/etapa4-laco-simulacao`: laço completo do núcleo, mapa de registradores finais reais, TDD e revisão independente do núcleo sem achados; 92/0/0. Estatísticas, logs reais e execução principal integrada pendentes; revisões documental e final aprovadas sem achados. |
-| 2026-10-11 | `75941d0` | Código e testes do laço completo registrados após autorização de dois commits separados e revisão independente pré-commit sem achados; contextos em preparação para o segundo commit, sem merge ou push. |
+| 2026-10-11 | `75941d0` | Código e testes do laço completo registrados após autorização de dois commits separados e revisão independente pré-commit sem achados; naquele momento, contextos em preparação para o segundo commit, sem merge ou push. |
+| 2026-10-11 | `05bc657` | Contextos da quarta etapa registrados em commit separado; após autorização do usuário, ambos os commits integrados localmente à `main` por fast-forward de `94a9482`, sem push. Suíte pós-merge aprovada com 92/0/0. |
 
 Verificação da entrega `748077f`: `cargo check --all-targets`, `cargo fmt --check`,
 `cargo clippy --all-targets -- -D warnings` e `git diff --check` aprovados;
@@ -321,9 +323,16 @@ A revisão independente pré-commit de código e contratos foi aprovada sem acha
 o revisor executou 34 testes nos alvos `laco`, `simulador` e `execucao`, todos
 aprovados, conferiu os resultados finais dos dez programas oficiais e o stage.
 O coordenador criou o commit `75941d0` (`feat: implement complete core simulation loop`)
-com exatamente `src/main.rs`, `src/simulador.rs` e `tests/laco.rs`. Os contextos
-desta entrega estão em preparação para o segundo commit autorizado, sem hash
+com exatamente `src/main.rs`, `src/simulador.rs` e `tests/laco.rs`. Naquele momento,
+os contextos estavam em preparação para o segundo commit autorizado, sem hash
 antecipado e sem merge ou push.
+
+Os contextos foram registrados em `05bc657` (`docs: update context and history for core simulation loop`).
+Após autorização do usuário, o coordenador integrou os commits `75941d0` e
+`05bc657` localmente à `main` por fast-forward de `94a9482` para `05bc657`, sem
+push. A suíte pós-merge executada pelo coordenador teve 92 aprovados, zero falhas
+e zero ignorados. Estatísticas, logs reais e execução principal integrada
+continuam pendentes; a integração Git não amplia esse escopo.
 
 ## Como manter
 
