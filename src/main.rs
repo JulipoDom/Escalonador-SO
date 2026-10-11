@@ -14,9 +14,9 @@ fn executar() -> Result<(), ErroEp> {
     let diretorio = Path::new("programas");
     let _processos = carregar_programas(diretorio)?;
     let _quantum = ler_quantum(diretorio)?;
-    // Não abrir o log enquanto a simulação está pendente.
+    // A integração da simulação com estatísticas e logs continua pendente.
     Err(ErroEp::NaoImplementado(
-        "laço de simulação, despacho e transições de processos",
+        "integração da simulação com estatísticas e logs",
     ))
 }
 

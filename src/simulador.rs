@@ -1,4 +1,4 @@
-//! Execução de quantum, passo de escalonamento e contrato reservado do laço.
+//! Execução de quantum, passo de escalonamento e laço completo do núcleo.
 use crate::{
     erros::ErroEp,
     filas::{FilaBloqueados, FilaProntos},
@@ -8,7 +8,7 @@ use crate::{
     registro::RegistroLog,
     tabela_processos::TabelaProcessos,
 };
-use std::collections::HashSet;
+use std::collections::{HashMap, HashSet};
 
 /// Resultado de um único despacho ou tick lógico, sem estatísticas ou logs.
 #[derive(Debug)]
@@ -157,31 +157,50 @@ pub fn executar_quantum(bcp: &mut Bcp, quantum: usize) -> Result<ResultadoQuantu
     })
 }
 
-/// Coordenará a tabela proprietária de todos os BCPs ativos e filas de IDs.
-/// Cada despacho descontará um crédito com saturação em zero. Redistribuirá
-/// somente quando todos os ativos, inclusive bloqueados, tiverem zero.
-/// O BCP executando permanecerá na tabela; antes de remover um terminado,
-/// salvará seu nome e registradores finais. A simulação termina com tabela vazia.
-///
-/// E/S define espera dois e entra no fim da fila FIFO. Ao fim do surto, somente
-/// bloqueados que já existiam em seu início terão a espera descontada: o surto
-/// que iniciou a própria E/S não conta. Dois surtos posteriores bastam, mesmo
-/// do mesmo PID ou mais curtos que o quantum. Liberar elegíveis em ordem FIFO.
-/// Sem prontos, avançar espera em unidades lógicas até haver pronto; ociosidade
-/// não executa instruções, desconta créditos ou participa das médias.
-///
-/// Ordem das transições: registrar parada; reinserir, bloquear ou remover o
-/// atual; atualizar bloqueados anteriores; liberar elegíveis; verificar
-/// redistribuição antes do próximo despacho. Reinserção por quantum precede
-/// empates, retorno de E/S sucede empates; FIFO prevalece quando prontos têm
-/// zero e algum bloqueado tem crédito. Não duplicar IDs nem contextos.
-/// Nesta base retorna erro sem escrever eventos, resumo ou resultados fictícios.
+/// Executa o núcleo até a conclusão, sem estatísticas ou registro.
+/// Preserva os contextos fornecidos e propaga erros sem resultados parciais.
+/// A conclusão depende de `executar_passo`, inclusive durante a ociosidade.
+pub fn executar_laco(
+    processos: Vec<Bcp>,
+    quantum: usize,
+) -> Result<HashMap<ProcessId, (i64, i64)>, ErroEp> {
+    if quantum == 0 {
+        return Err(ErroEp::Entrada("quantum deve ser positivo".into()));
+    }
+    let mut tabela = TabelaProcessos::nova();
+    for bcp in processos {
+        tabela.inserir(bcp)?;
+    }
+    let mut prontos = FilaProntos::nova();
+    prontos.ordenar_inicial(&tabela)?;
+    let mut bloqueados = FilaBloqueados::nova();
+    let mut registradores_finais = HashMap::new();
+    loop {
+        match executar_passo(&mut tabela, &mut prontos, &mut bloqueados, quantum)? {
+            ResultadoPasso::Surto {
+                terminado: Some(bcp),
+                ..
+            } => {
+                registradores_finais.insert(bcp.pid, (bcp.x, bcp.y));
+            }
+            ResultadoPasso::Surto {
+                terminado: None, ..
+            }
+            | ResultadoPasso::Ocioso { .. } => {}
+            ResultadoPasso::Concluido => return Ok(registradores_finais),
+        }
+    }
+}
+
+/// Integração reservada do laço com estatísticas e registro.
+/// O núcleo está disponível em `executar_laco`; esta API exige também resumo
+/// e eventos reais. Retorna erro antes de executar ou escrever qualquer evento.
 pub fn simular(
     _processos: Vec<Bcp>,
     _quantum: usize,
     _registro: &mut RegistroLog,
 ) -> Result<ResultadoSimulacao, ErroEp> {
     Err(ErroEp::NaoImplementado(
-        "laço de simulação, despacho por créditos, transições e espera lógica de E/S",
+        "integração do laço com estatísticas e registro",
     ))
 }
