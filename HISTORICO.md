@@ -1,18 +1,27 @@
 # Histórico e acompanhamento do EP1
 
-Última conferência: **2026-10-11**, base Git `e61ce88`, branch `main`.
-Estado atual: quinta etapa registrada no commit `e61ce88` com exatamente 11
-arquivos, após última revisão pré-commit aprovada e nova verificação do coordenador.
+Última conferência: **2026-10-11**, base Git `5ca6f6c`, branch
+`codex/etapa6-execucao-integrada`.
+Estado atual: sexta etapa autorizada implementada em `main` e testes de execução,
+em trabalho ainda sem commit, stage, merge ou push desta etapa. O usuário autorizou
+commit, merge na `main` e push; as operações e novas verificações de publicação
+ainda estão pendentes, com HEAD e `main` em `5ca6f6c`. Programas, prioridades e
+quantum são validados antes de criar o log no diretório corrente; `simular` publica
+eventos e resumo reais antes do sucesso. Evidência do autor: RED compilável com
+5 aprovados, 6 falhas esperadas e zero ignorados; GREEN de execução 11/0/0 e suíte
+completa 117/0/0. Revisão independente de código aprovada sem achados. Checks globais do coordenador aprovados: check, suíte 117/0/0, fmt, Clippy
+e diff check. Revisão documental/final aprovada em conformidade e qualidade, sem achados críticos, importantes ou menores. Experimentos e relatório PDF são os próximos passos propostos e exigem
+novo pedido.
+
+A quinta etapa permanece registrada em `e61ce88`, com exatamente 11 arquivos,
+após última revisão pré-commit e nova verificação do coordenador aprovadas.
 Merge local por fast-forward autorizado da branch `codex/etapa5-logs-estatisticas`
 concluído, avançando a `main` de `eddae3c` para `e61ce88`; suíte pós-merge com
 111 aprovados, zero falhas e zero ignorados. Sem push; branch da etapa preservada.
-Na API, `simular` produz eventos, estatísticas, resumo e registradores
-finais reais, preservando o contrato de `executar_laco`. A suíte do autor do núcleo
-teve 111 aprovados, zero falhas e zero ignorados. Revisão independente de
-conformidade e qualidade da saída e do núcleo aprovadas sem achados;
-verificações do coordenador aprovadas: check, suíte 111/0/0, fmt em modo check,
-Clippy e diff check. Revisão documental e final do conjunto aprovada em conformidade e qualidade, sem achados críticos, importantes ou menores.
-A execução principal integrada, os experimentos e o relatório PDF permanecem pendentes.
+Na API, `simular` produz eventos, estatísticas, resumo e registradores finais reais,
+preservando o contrato de `executar_laco`. Revisões independentes da saída e do
+núcleo, documental e final daquela entrega aprovadas sem achados; check, suíte
+111/0/0, fmt, Clippy e diff check aprovados pelo coordenador.
 
 As etapas anteriores permanecem registradas: quarta etapa em `75941d0`, contextos
 em `05bc657`, integrados à `main` por fast-forward autorizado de `94a9482`, com
@@ -27,29 +36,30 @@ A base atual preserva os 12 arquivos oficiais em `programas/`. A primeira etapa
 autorizada executa instruções e quantum; a segunda implementa filas, política de
 créditos e operações de espera de E/S; a terceira integra despacho, transições e
 ociosidade em um passo; a quarta completa o laço do núcleo até a conclusão; a
-quinta integra estatísticas e logs reais na API `simular`, sem consumir essa API
-em `main`. Execução principal integrada, experimentos e relatório PDF continuam pendentes.
+quinta integra estatísticas e logs reais na API `simular`; a sexta integra essa API
+em `main`, usando o carregador e o escritor existentes. A revisão final da sexta
+etapa foi aprovada em conformidade e qualidade, sem achados; experimentos e relatório PDF exigem novo pedido.
 
 ## Estado atual por módulo
 
 | Módulo | Implementado | Pendente |
 | --- | --- | --- |
 | `modelos`, `erros` | Instruções, BCP, IDs, estados, resultados e erros | Ajustes somente se exigidos pelo núcleo |
-| `carregador` | Leitura e validação de programas, prioridades e quantum | Integração com a simulação |
+| `carregador` | Leitura e validação de programas, prioridades e quantum, consumidas por `main` antes de criar o log | — |
 | `tabela_processos` | Posse dos BCPs, inserção sem sobrescrever PID, consulta e remoção, usadas pelo laço | — |
 | `filas`, `politica` | Carga, seleção, reordenação, reinserções, bloqueio, avanço de esperas, desconto e redistribuição de créditos, consumidos pelo passo e pelo laço | — |
 | `interpretador` | Atribuições, COM, E/S, SAIDA, validação e avanço único do PC, consumidos pelo laço | — |
-| `simulador` | Quantum, passo, `executar_laco` e `simular` com eventos, resumo e registradores finais reais | Integração principal |
+| `simulador` | Quantum, passo, `executar_laco` e `simular` com eventos, resumo e registradores finais reais, consumida por `main` | — |
 | `estatisticas` | Contadores de despachos concluídos e instruções; médias D/P e I/D em f64, com denominadores validados e overflow sem mutação parcial | — |
-| `registro` | Escritor preservado, consumido por `simular` com eventos e resumo reais; falhas de escrita/publicação propagadas | Criação do log pela execução principal |
-| `main` | Recusa argumentos, valida `programas/` no diretório corrente | Integrar simulação, log e resumo reais |
+| `registro` | Escritor preservado; `main` cria o log do quantum escolhido, `simular` escreve eventos e resumo reais e propaga falhas | — |
+| `main` | Recusa argumentos, valida `programas/` no diretório corrente e integra simulação, log e resumo reais | — |
 
-`simular` está implementada; o contrato pendente permanece somente na execução
-principal. `main` não foi alterado: após validar a entrada, falha com código 1,
-stdout vazio e `Não implementado: integração da simulação com estatísticas e logs`,
-sem criar logs. A mensagem preservada descreve a integração principal pendente;
-não descreve uma recusa da API. Testes de recusa do binário e testes da saída real
-de `simular` verificam contratos diferentes.
+`main` chama `simular` após carregar programas, ler quantum e criar `logXX.txt`
+no diretório corrente. Só substitui o log do quantum escolhido após validar toda
+a entrada; logs de outros quantums são preservados. Sucesso retorna código 0
+com stdout/stderr vazios após publicação final; erros retornam código 1 e
+diagnóstico em stderr. Eventos reais parciais podem permanecer após erro de
+execução ou escrita. Não há CLI configurável, lote automático ou CSV.
 
 ## Decisões vigentes
 
@@ -104,7 +114,8 @@ de `simular` verificam contratos diferentes.
   registra filas, política e esperas; o [plano da terceira etapa](docs/superpowers/plans/2026-10-11-etapa3-transicoes-es.md)
   registra o passo integrado; o [plano da quarta etapa](docs/superpowers/plans/2026-10-11-etapa4-laco-simulacao.md)
   registra o laço completo; o [plano da quinta etapa](docs/superpowers/plans/2026-10-11-etapa5-logs-estatisticas.md)
-  registra estatísticas e logs reais na API. Integração principal e etapas seguintes exigem novo pedido.
+  registra estatísticas e logs reais na API; o [plano da sexta etapa](docs/superpowers/plans/2026-10-11-etapa6-execucao-integrada.md)
+  registra a execução principal autorizada. Experimentos e relatório exigem novo pedido.
 
 ## Sequência proposta de implementação e verificação
 
@@ -127,9 +138,16 @@ de `simular` verificam contratos diferentes.
   denominadores, E/S/SAIDA, PID repetido, ordem, ociosidade e erros aprovados pelo
   autor, com suíte 111/0/0. Revisões da saída e do núcleo aprovadas sem achados;
   verificações do coordenador aprovadas com 111/0/0; revisão documental e final aprovada em conformidade e qualidade, sem achados críticos, importantes ou menores.
-- [ ] Próximo passo proposto: integrar `main` somente depois das estatísticas e logs reais, substituindo
-  a recusa pela execução com eventos e resumo reais.
-- [ ] Executar manualmente ao menos dez quantums uniformemente distribuídos em
+- [x] Integrar `main` com carregamento, quantum e `simular`; autor: RED compilável
+  5/6/0, GREEN de execução 11/0/0 e suíte 117/0/0. Revisão independente de código
+  aprovada sem achados; checks globais do coordenador aprovados; revisão documental/final aprovada em conformidade e qualidade, sem achados críticos, importantes ou menores.
+- [x] Conferir execução das entradas oficiais copiadas em diretório temporário:
+  q3, código 0, streams vazios, dez cargas/términos e resumo real; entradas intactas.
+- [x] Checks globais do coordenador aprovados: check de todos os alvos, suíte
+  117/0/0, fmt em modo check, Clippy com warnings negados e diff check.
+- [x] Revisão documental/final da sexta etapa aprovada em conformidade e
+  qualidade, sem achados críticos, importantes ou menores.
+- [ ] Próximo passo proposto, após novo pedido: executar manualmente ao menos dez quantums uniformemente distribuídos em
   intervalo útil; reunir logs, médias, tabelas e gráficos para justificar o quantum no PDF.
 
 Ideia dentro do escopo: usar programas pequenos com resultado calculado à mão
@@ -161,6 +179,9 @@ proposta de validação, não uma funcionalidade adicional prometida.
 | 2026-10-11 | Entrega sem commit sobre `eddae3c` | Quinta etapa na branch `codex/etapa5-logs-estatisticas`: estatísticas e logs reais em `simular`, TDD, suíte do autor 111/0/0 e revisões da saída e do núcleo aprovadas sem achados; check, suíte 111/0/0, fmt, Clippy e diff check do coordenador aprovados. Revisão documental e final aprovada em conformidade e qualidade, sem achados críticos, importantes ou menores. Execução principal integrada, experimentos e relatório pendentes. |
 | 2026-10-11 | Trabalho sobre `eddae3c` | Usuário colocou os 11 arquivos da quinta etapa em stage e autorizou commit e merge local na `main`, após última revisão e nova verificação; essas conferências e as operações Git ainda pendentes. Sem pedido de push ou ampliação do escopo. |
 | 2026-10-11 | `e61ce88` | Quinta etapa registrada após última revisão pré-commit aprovada e integrada localmente à `main` por fast-forward autorizado de `eddae3c`; 11 arquivos no commit, suíte pós-merge 111/0/0, sem push. Branch da etapa preservada; execução principal integrada continua pendente. |
+| 2026-10-11 | Entrega sem commit sobre `5ca6f6c` | Sexta etapa na branch `codex/etapa6-execucao-integrada`: integração de `main` com carregamento, quantum e `simular`; RED compilável 5/6/0, GREEN de execução 11/0/0 e suíte do autor 117/0/0. Revisão independente de código aprovada sem achados; checks globais do coordenador aprovados (check, suíte 117/0/0, fmt, Clippy e diff check); revisão documental/final aprovada em conformidade e qualidade, sem achados críticos, importantes ou menores; sem stage, commit, merge ou push desta etapa. |
+
+| 2026-10-11 | Trabalho sobre `5ca6f6c` | Usuário autorizou commit da sexta etapa, merge na `main` e push. HEAD e `main` ainda em `5ca6f6c`, oito arquivos da entrega sem stage (sete rastreados e o plano novo); novas conferências e operações Git pendentes. Experimentos e relatório continuam fora deste pedido. |
 
 Verificação da entrega `748077f`: `cargo check --all-targets`, `cargo fmt --check`,
 `cargo clippy --all-targets -- -D warnings` e `git diff --check` aprovados;
@@ -436,6 +457,47 @@ por fast-forward, avançando de `eddae3c` para `e61ce88`. `cargo test` executado
 a branch da etapa foi preservada. A integração Git não implementa a execução
 principal: esse recorte, os experimentos e o relatório continuam pendentes.
 Este registro factual prepara o commit documental local seguinte, ainda sem hash.
+
+## Verificação da sexta etapa
+
+O autor de execução registrou RED compilável de `cargo test --test execucao`
+com 5 aprovados, 6 falhas esperadas pelo stub e zero ignorados. GREEN do mesmo
+alvo: 11 aprovados, zero falhas e zero ignorados; suíte completa: 117/0/0.
+Formatação e verificação de whitespace restritas a `src/main.rs` e
+`tests/execucao.rs` aprovadas pelo autor. Os testes calculados à mão cobrem q1,
+q2 com E/S e q3, médias e registradores reais, substituição seletiva de log,
+recusa de argumentos e entradas inválidas antes de truncar log anterior, erro de
+criação e erro de publicação em `/dev/full` no Linux. Esse teste foi executado
+nesta máquina e falha na publicação do primeiro evento; não isola falha tardia
+no flush final. A API existente exige publicação final antes de devolver sucesso.
+
+Revisão independente de código aprovada em conformidade e qualidade, sem
+achados críticos, importantes ou menores. O coordenador executou o binário com
+cópias byte a byte das 12 entradas oficiais em diretório temporário: quantum 3,
+código 0, stdout/stderr vazios, dez cargas e dez términos, 59 despachos e 139
+instruções. O resumo foi conferido contra o log e as instruções originais:
+média de trocas 5.9 e média de instruções 2.3559322033898304. Entradas originais
+e cópias intactas; os 31 snapshots de entradas, PDF, acervo, cinco APIs e
+boilerplate foram preservados. Essa execução verifica a integração; os
+experimentos de dez quantums não foram realizados.
+
+Verificações globais executadas pelo coordenador após cessarem as primeiras
+edições: `cargo check --all-targets`, `cargo test`, `cargo fmt --check`,
+`cargo clippy --all-targets -- -D warnings` e `git diff --check` aprovados.
+Suíte: 117 aprovados, zero falhas e zero ignorados; 2 testes de lib e 115 de
+integração, zero testes unitários de main e zero doctests. Snapshot dos 31
+arquivos preservado e nenhum log na raiz. Revisão documental/final aprovada em conformidade e qualidade, sem achados críticos, importantes ou menores.
+Não foram executados stage, commit, merge ou push desta etapa; não foram
+produzidos experimentos de dez quantums ou relatório.
+
+Após a entrega sem commit, o usuário autorizou registrar a sexta etapa em commit,
+integrá-la à `main` e realizar push. Essa autorização substitui a condição
+anterior de trabalho sem operações Git; não amplia o escopo técnico nem autoriza
+experimentos ou relatório. Nesta atualização, a branch permanece
+`codex/etapa6-execucao-integrada`, com HEAD e `main` em `5ca6f6c` e oito arquivos
+da entrega sem stage (sete rastreados e o plano novo). Novas verificações de
+publicação, commit, merge e push ainda pendentes; nenhuma dessas operações é
+afirmada como concluída.
 
 ## Como manter
 

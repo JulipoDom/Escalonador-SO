@@ -1,6 +1,8 @@
 use ep1_escalonador::{
     carregador::{carregar_programas, ler_quantum},
     erros::ErroEp,
+    registro::RegistroLog,
+    simulador::simular,
 };
 use std::{path::Path, process::ExitCode};
 
@@ -12,12 +14,11 @@ fn executar() -> Result<(), ErroEp> {
         )));
     }
     let diretorio = Path::new("programas");
-    let _processos = carregar_programas(diretorio)?;
-    let _quantum = ler_quantum(diretorio)?;
-    // A integração da simulação com estatísticas e logs continua pendente.
-    Err(ErroEp::NaoImplementado(
-        "integração da simulação com estatísticas e logs",
-    ))
+    let processos = carregar_programas(diretorio)?;
+    let quantum = ler_quantum(diretorio)?;
+    let mut registro = RegistroLog::criar(Path::new("."), quantum)?;
+    simular(processos, quantum, &mut registro)?;
+    Ok(())
 }
 
 fn main() -> ExitCode {
