@@ -1,11 +1,12 @@
 # Histórico e acompanhamento do EP1
 
-Última conferência: **2026-10-11**, base Git `eddae3c`, branch `codex/etapa5-logs-estatisticas`.
-Estado atual: quinta etapa implementada; os 11 arquivos foram colocados em stage
-pelo usuário, que autorizou commit e merge local na `main`. Última revisão
-pré-commit aprovada em conformidade e qualidade sem achados; nova verificação
-do coordenador aprovada com check, suíte 111/0/0, fmt e Clippy. Commit e merge
-ainda pendentes. Sem pedido de push. Na API, `simular` produz eventos, estatísticas, resumo e registradores
+Última conferência: **2026-10-11**, base Git `e61ce88`, branch `main`.
+Estado atual: quinta etapa registrada no commit `e61ce88` com exatamente 11
+arquivos, após última revisão pré-commit aprovada e nova verificação do coordenador.
+Merge local por fast-forward autorizado da branch `codex/etapa5-logs-estatisticas`
+concluído, avançando a `main` de `eddae3c` para `e61ce88`; suíte pós-merge com
+111 aprovados, zero falhas e zero ignorados. Sem push; branch da etapa preservada.
+Na API, `simular` produz eventos, estatísticas, resumo e registradores
 finais reais, preservando o contrato de `executar_laco`. A suíte do autor do núcleo
 teve 111 aprovados, zero falhas e zero ignorados. Revisão independente de
 conformidade e qualidade da saída e do núcleo aprovadas sem achados;
@@ -159,6 +160,7 @@ proposta de validação, não uma funcionalidade adicional prometida.
 | 2026-10-11 | `434f43b` | Após autorização do usuário, publicação dos cinco commits locais em `origin/main` concluída, avançando a remota de `7ced42f` para `434f43b`, incluindo as etapas três e quatro. |
 | 2026-10-11 | Entrega sem commit sobre `eddae3c` | Quinta etapa na branch `codex/etapa5-logs-estatisticas`: estatísticas e logs reais em `simular`, TDD, suíte do autor 111/0/0 e revisões da saída e do núcleo aprovadas sem achados; check, suíte 111/0/0, fmt, Clippy e diff check do coordenador aprovados. Revisão documental e final aprovada em conformidade e qualidade, sem achados críticos, importantes ou menores. Execução principal integrada, experimentos e relatório pendentes. |
 | 2026-10-11 | Trabalho sobre `eddae3c` | Usuário colocou os 11 arquivos da quinta etapa em stage e autorizou commit e merge local na `main`, após última revisão e nova verificação; essas conferências e as operações Git ainda pendentes. Sem pedido de push ou ampliação do escopo. |
+| 2026-10-11 | `e61ce88` | Quinta etapa registrada após última revisão pré-commit aprovada e integrada localmente à `main` por fast-forward autorizado de `eddae3c`; 11 arquivos no commit, suíte pós-merge 111/0/0, sem push. Branch da etapa preservada; execução principal integrada continua pendente. |
 
 Verificação da entrega `748077f`: `cargo check --all-targets`, `cargo fmt --check`,
 `cargo clippy --all-targets -- -D warnings` e `git diff --check` aprovados;
@@ -414,8 +416,8 @@ sem achados críticos, importantes ou menores.
 
 Após colocar os 11 arquivos da quinta etapa em stage, o usuário autorizou commit
 na branch `codex/etapa5-logs-estatisticas` e merge local na `main`, exigindo última
-revisão antes dessas operações. HEAD e `main` permanecem em `eddae3c` nesta
-conferência. A autorização substitui a condição anterior de trabalho sem stage,
+revisão antes dessas operações. Naquela conferência, HEAD e `main` permaneciam
+em `eddae3c`. A autorização substitui a condição anterior de trabalho sem stage,
 commit ou merge; não autoriza push nem a integração da execução principal.
 Última revisão pré-commit aprovada em conformidade e qualidade, sem achados
 críticos, importantes ou menores. Nova verificação executada pelo coordenador:
@@ -423,8 +425,17 @@ críticos, importantes ou menores. Nova verificação executada pelo coordenador
 ignorados), `cargo fmt --check` e `cargo clippy --all-targets -- -D warnings`
 aprovados. Os 25 arquivos protegidos permanecem intactos contra `eddae3c`.
 Execução principal com código 1, stdout vazio, diagnóstico exato preservado e
-zero logs antes/depois. Commit e merge local ainda pendentes; não há hash
-antecipado nem publicação afirmada.
+zero logs antes/depois. Naquela conferência, commit e merge local ainda estavam
+pendentes, sem hash antecipado ou publicação afirmada.
+
+O coordenador criou o commit autorizado `e61ce88` (`feat: integrate real simulation
+logs and statistics`) na branch `codex/etapa5-logs-estatisticas`, com exatamente
+os 11 arquivos da quinta etapa. Depois, mudou para `main` e executou o merge local
+por fast-forward, avançando de `eddae3c` para `e61ce88`. `cargo test` executado na
+`main` após o merge teve 111 aprovados, zero falhas e zero ignorados. Sem push;
+a branch da etapa foi preservada. A integração Git não implementa a execução
+principal: esse recorte, os experimentos e o relatório continuam pendentes.
+Este registro factual prepara o commit documental local seguinte, ainda sem hash.
 
 ## Como manter
 
