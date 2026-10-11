@@ -1,11 +1,11 @@
 # Histórico e acompanhamento do EP1
 
-Última conferência: **2026-10-11**, base Git `7ced42f`, branch
-`codex/etapa3-transicoes-es`. Estado atual: terceira etapa de despacho, transições
-e E/S em um passo integrado implementada e verificada, colocada em stage pelo
-usuário; revisão pré-commit e commit autorizados se o conjunto estiver correto.
-Essa conferência foi aprovada sem achados; push e merge não foram solicitados. Revisão independente do núcleo em conformidade e qualidade
-aprovada sem achados; revisões documental e final do conjunto aprovadas sem achados.
+Última conferência: **2026-10-11**, base Git `57099c4`, branch `main`.
+Estado atual: terceira etapa de despacho, transições e E/S em um passo integrado
+registrada no commit `57099c4` e integrada localmente à `main` por fast-forward
+autorizado de `7ced42f`, sem push. Revisões independentes do núcleo, documentação,
+conjunto e pré-commit aprovadas sem achados; suíte pós-merge com 77 aprovados,
+zero falhas e zero ignorados.
 A segunda etapa foi registrada em `8d4d172`, integrada e publicada na `main`;
 o enunciado `ep1.pdf` foi incluído como contexto em `7336c37`. O laço completo,
 estatísticas, logs reais e integração de `main` continuam pendentes.
@@ -116,6 +116,7 @@ proposta de validação, não uma funcionalidade adicional prometida.
 | 2026-10-11 | `7336c37` | Enunciado `ep1.pdf` incluído como contexto do projeto; publicação autorizada dos commits locais em `origin/main` concluída. |
 | 2026-10-11 | Entrega sem commit sobre `7ced42f` | Terceira etapa na branch `codex/etapa3-transicoes-es`: passo integrado de despacho, transições e E/S com TDD real, revisão independente do núcleo e 77/0/0; revisão final aprovada sem achados; laço completo pendente. |
 | 2026-10-11 | Trabalho sobre `7ced42f` | Usuário colocou a terceira etapa em stage e autorizou revisão pré-commit e commit se o conjunto estiver correto; conferência aprovada sem achados, sem pedido de push ou merge. |
+| 2026-10-11 | `57099c4` | Terceira etapa registrada e integrada localmente à `main` por fast-forward autorizado de `7ced42f`, sem push; suíte pós-merge aprovada com 77/0/0. |
 
 Verificação da entrega `748077f`: `cargo check --all-targets`, `cargo fmt --check`,
 `cargo clippy --all-targets -- -D warnings` e `git diff --check` aprovados;
@@ -234,14 +235,21 @@ em conformidade e qualidade, sem achados críticos, importantes ou menores.
 Após colocar a terceira etapa em stage, o usuário autorizou revisar o conjunto e
 criar o commit na branch atual se tudo estiver correto. Essa autorização substitui
 a condição anterior de trabalho sem stage ou commit; não amplia o escopo do
-núcleo. Verificações pré-commit deste turno executadas pelo coordenador: check de todos os
+núcleo. Verificações pré-commit daquela entrega executadas pelo coordenador: check de todos os
 alvos, testes (77 aprovados, zero falhas e zero ignorados), fmt e Clippy com
 warnings negados aprovados. Os 12 arquivos oficiais, PDF, acervo, boilerplate e
 módulos fora do escopo permanecem intactos; CPU e stub preservados. Execução com
 código 1, stdout vazio, erro explícito e sem logs. A revisão independente
 pré-commit de conformidade e qualidade foi aprovada sem achados críticos,
 importantes ou menores; oito arquivos em stage conferidos e
-`git diff --cached --check` aprovado. Push e merge não foram solicitados.
+`git diff --cached --check` aprovado. Naquele momento, push e merge não haviam
+sido solicitados.
+
+O commit autorizado da terceira etapa foi criado como `57099c4`
+(`feat: integrate process transitions and I/O scheduling steps`). Após autorização
+do usuário, o coordenador integrou `codex/etapa3-transicoes-es` localmente à `main`
+por fast-forward de `7ced42f` para `57099c4`, sem push. `cargo test` pós-merge teve
+77 aprovados, zero falhas e zero ignorados. O laço completo continua pendente.
 
 ## Como manter
 
