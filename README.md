@@ -4,7 +4,7 @@ Base do EP1 de Sistemas Operacionais de 2026 em Rust stable, edição 2021, com 
 
 Estado, decisões e próximos passos: [Histórico do projeto](HISTORICO.md).
 
-Fluxo de desenvolvimento com Superpowers: [instruções](AGENTS.md), [contexto vigente](docs/superpowers/plans/2026-10-10-contexto-atual.md), [plano da primeira etapa](docs/superpowers/plans/2026-10-10-etapa1-interpretador-quantum.md) e [índice e acervo](docs/superpowers/README.md).
+Fluxo de desenvolvimento com Superpowers: [instruções](AGENTS.md), [contexto vigente](docs/superpowers/plans/2026-10-10-contexto-atual.md), [plano da primeira etapa](docs/superpowers/plans/2026-10-10-etapa1-interpretador-quantum.md), [plano da segunda etapa](docs/superpowers/plans/2026-10-10-etapa2-filas-politica.md) e [índice e acervo](docs/superpowers/README.md).
 
 Execute na raiz deste projeto, onde estão `programas/` e o [enunciado de 2026](ep1.pdf):
 
@@ -21,9 +21,13 @@ Modelos, carregamento e validação das entradas, tabela de processos e escrita 
 
 PC fora do texto retorna `EstadoInvalido` sem mutação da instrução inválida. Quantum zero retorna `Entrada` antes de consultar o PC e sem modificar o BCP; um erro após instruções válidas preserva o progresso já executado. Estado, créditos e espera não são alterados pelo interpretador ou quantum.
 
-Filas e política são o primeiro próximo passo proposto. Controle de E/S, laço de simulação, estatísticas e integração da execução permanecem pendentes com `ErroEp::NaoImplementado` específico. A execução valida a entrada e encerra com código 1, sem criar logs. Os testes dos contratos pendentes verificam essa recusa; a execução de quantum isolada não comprova a simulação completa.
+A segunda etapa implementa carga e seleção de prontos, reordenação estável por créditos, reinserções de quantum e retorno de E/S, desconto saturado e redistribuição de créditos. Filas guardam somente IDs e validam existência, estado e duplicidade antes de mutar. A seleção não altera o estado do BCP; cabe ao futuro laço definir Executando e as transições posteriores.
 
-Convenções para as etapas restantes conforme o [enunciado de 2026](ep1.pdf):
+As operações de E/S também estão implementadas: bloquear exige Executando, define Bloqueado e espera 2; avançar esperas desconta somente os IDs de um snapshot anterior validado e libera elegíveis em FIFO, definindo Pronto e espera 0. Novos bloqueados não perdem espera no próprio surto. A integração dessas operações às transições, aos surtos e à ociosidade é o próximo passo proposto.
+
+Laço de simulação, despacho e transições integradas, estatísticas e integração da execução permanecem pendentes com `ErroEp::NaoImplementado` específico. A execução valida a entrada e encerra com código 1, sem criar logs. Os testes dos contratos pendentes verificam essa recusa; a execução de quantum isolada não comprova a simulação completa.
+
+Convenções vigentes conforme o [enunciado de 2026](ep1.pdf):
 
 - A tabela possui os BCPs; filas guardam somente `ProcessId`. Toda instrução, inclusive E/S e SAIDA, consome uma unidade e avança o PC uma vez; E/S retoma na seguinte.
 - Créditos começam na prioridade; escolher o maior crédito pronto e descontar um por despacho, sem ficar negativo. Redistribuir as prioridades somente quando todos os ativos, inclusive bloqueados, têm zero. Terminados não participam.

@@ -55,29 +55,91 @@ fn pid_duplicado_nao_substitui_contexto_original() {
 }
 
 #[test]
-fn contratos_pendentes_retornam_erro_sem_alterar_filas_ou_contexto() {
-    use ep1_escalonador::{
-        filas::{FilaBloqueados, FilaProntos},
-        politica::{descontar_credito, redistribuir_se_necessario},
-    };
+fn desconto_e_unitario_saturado_e_preserva_contexto() {
+    use ep1_escalonador::politica::descontar_credito;
     let mut tabela = TabelaProcessos::nova();
-    tabela.inserir(processo(1, 3)).unwrap();
-    let mut prontos = FilaProntos::nova();
-    let mut bloqueados = FilaBloqueados::nova();
-    let antes = format!("{tabela:?}");
-    fn pendente<T>(resultado: Result<T, ErroEp>) {
-        assert!(matches!(resultado, Err(ErroEp::NaoImplementado(regra)) if !regra.is_empty()));
+    let mut bcp = processo(1, 2);
+    bcp.pc = 7;
+    bcp.x = 42;
+    bcp.y = -3;
+    tabela.inserir(bcp).unwrap();
+    for esperado in [1, 0, 0] {
+        descontar_credito(ProcessId(1), &mut tabela).unwrap();
+        let bcp = tabela.get(ProcessId(1)).unwrap();
+        assert_eq!(
+            (bcp.creditos, bcp.prioridade, bcp.pc, bcp.x, bcp.y),
+            (esperado, 2, 7, 42, -3)
+        );
     }
-    pendente(prontos.ordenar_inicial(&tabela));
-    pendente(prontos.selecionar(&tabela));
-    pendente(prontos.reinserir_apos_quantum(ProcessId(1), &tabela));
-    pendente(prontos.reinserir_apos_es(ProcessId(1), &tabela));
-    pendente(prontos.reordenar_apos_redistribuicao(&tabela));
-    pendente(bloqueados.bloquear(ProcessId(1), &mut tabela));
-    pendente(bloqueados.avancar_esperas(&[ProcessId(1)], &mut tabela));
-    pendente(descontar_credito(ProcessId(1), &mut tabela));
-    pendente(redistribuir_se_necessario(&mut tabela));
-    assert!(prontos.ids().is_empty());
-    assert!(bloqueados.ids().is_empty());
+    let antes = format!("{tabela:?}");
+    assert!(matches!(
+        descontar_credito(ProcessId(99), &mut tabela),
+        Err(ErroEp::EstadoInvalido(_))
+    ));
     assert_eq!(format!("{tabela:?}"), antes);
+}
+
+#[test]
+fn credito_de_bloqueado_impede_redistribuicao() {
+    use ep1_escalonador::{modelos::EstadoProcesso, politica::redistribuir_se_necessario};
+    let mut tabela = TabelaProcessos::nova();
+    let mut pronto = processo(1, 5);
+    pronto.creditos = 0;
+    let mut bloqueado = processo(2, 3);
+    bloqueado.estado = EstadoProcesso::Bloqueado;
+    tabela.inserir(pronto).unwrap();
+    tabela.inserir(bloqueado).unwrap();
+    let antes = format!("{tabela:?}");
+    assert!(!redistribuir_se_necessario(&mut tabela).unwrap());
+    assert_eq!(format!("{tabela:?}"), antes);
+}
+
+#[test]
+fn redistribuicao_restaura_prioridades_de_todos_os_ativos() {
+    use ep1_escalonador::{modelos::EstadoProcesso, politica::redistribuir_se_necessario};
+    let mut tabela = TabelaProcessos::nova();
+    for (pid, prioridade, estado) in [
+        (1, 5, EstadoProcesso::Pronto),
+        (2, 3, EstadoProcesso::Bloqueado),
+        (3, 0, EstadoProcesso::Executando),
+    ] {
+        let mut bcp = processo(pid, prioridade);
+        bcp.creditos = 0;
+        bcp.estado = estado;
+        bcp.espera = 1;
+        tabela.inserir(bcp).unwrap();
+    }
+    assert!(redistribuir_se_necessario(&mut tabela).unwrap());
+    assert_eq!(tabela.get(ProcessId(1)).unwrap().creditos, 5);
+    let bloqueado = tabela.get(ProcessId(2)).unwrap();
+    assert_eq!(
+        (bloqueado.creditos, bloqueado.estado, bloqueado.espera),
+        (3, EstadoProcesso::Bloqueado, 1)
+    );
+    assert_eq!(tabela.get(ProcessId(3)).unwrap().creditos, 0);
+    assert!(!redistribuir_se_necessario(&mut tabela).unwrap());
+}
+
+#[test]
+fn vazia_e_prioridades_zero_nao_redistribuem() {
+    use ep1_escalonador::politica::redistribuir_se_necessario;
+    let mut tabela = TabelaProcessos::nova();
+    assert!(!redistribuir_se_necessario(&mut tabela).unwrap());
+    tabela.inserir(processo(1, 0)).unwrap();
+    assert!(!redistribuir_se_necessario(&mut tabela).unwrap());
+    assert!(!redistribuir_se_necessario(&mut tabela).unwrap());
+}
+
+#[test]
+fn terminado_removido_nao_impede_redistribuicao() {
+    use ep1_escalonador::politica::redistribuir_se_necessario;
+    let mut tabela = TabelaProcessos::nova();
+    let mut ativo = processo(1, 4);
+    ativo.creditos = 0;
+    tabela.inserir(ativo).unwrap();
+    tabela.inserir(processo(2, 9)).unwrap();
+    tabela.remover(ProcessId(2)).unwrap();
+    assert!(redistribuir_se_necessario(&mut tabela).unwrap());
+    assert_eq!(tabela.get(ProcessId(1)).unwrap().creditos, 4);
+    assert_eq!(tabela.len(), 1);
 }

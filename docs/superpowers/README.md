@@ -1,6 +1,6 @@
 # Superpowers no contexto atual
 
-O [contexto vigente](plans/2026-10-10-contexto-atual.md) organiza o método de trabalho e as próximas etapas propostas. O [plano da primeira etapa](plans/2026-10-10-etapa1-interpretador-quantum.md) registra o recorte autorizado de interpretador e quantum, implementado com TDD e revisão independente. Filas e política são o próximo passo proposto; o restante do núcleo exige nova autorização.
+O [contexto vigente](plans/2026-10-10-contexto-atual.md) organiza o método de trabalho e as próximas etapas propostas. O [plano da primeira etapa](plans/2026-10-10-etapa1-interpretador-quantum.md) registra o recorte autorizado de interpretador e quantum, implementado com TDD e revisão independente. A primeira etapa foi integrada à `main` no commit `7b92a6a`. O [plano da segunda etapa](plans/2026-10-10-etapa2-filas-politica.md) registra filas, política de créditos e operações de espera de E/S, implementadas e verificadas na branch `codex/etapa2-filas-politica`, ainda sem commit. A integração das transições e do laço é o próximo passo proposto; o restante do núcleo exige nova autorização.
 
 O [enunciado de 2026](../../ep1.pdf) está na raiz do projeto. A execução integrada continua recusando a simulação pendente e não produz logs ou medições.
 

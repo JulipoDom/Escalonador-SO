@@ -1,17 +1,20 @@
 # Histórico e acompanhamento do EP1
 
-Última conferência: **2026-10-10**, base Git `4210a1c`.
-Trabalho atual: primeira etapa de interpretador e quantum na branch
-`codex/etapa1-interpretador-quantum`, implementada nesta entrega. Implementação e revisão
-da etapa CPU concluídas; verificações finais e revisão independente do conjunto aprovadas.
+Última conferência: **2026-10-11**, base Git `7b92a6a`, primeira etapa integrada à `main`.
+Trabalho atual: segunda etapa de filas, política de créditos e operações de espera de E/S
+na branch `codex/etapa2-filas-politica`, implementada e revisada nesta entrega,
+autorizada para stage e commit na branch atual. Verificação do código e revisão
+independente pré-commit em 2026-10-11 aprovadas sem achados; a conferência exata
+do stage cabe ao coordenador antes do commit. Evidências registradas abaixo.
 
 ## Objetivo e escopo
 
 Implementar o escalonador do EP1 de Sistemas Operacionais de **2026**, conforme
 [enunciado na raiz](ep1.pdf), em Rust stable, edição 2021, Cargo e somente a biblioteca padrão.
 A base atual preserva os 12 arquivos oficiais em `programas/`. A primeira etapa
-autorizada executa instruções e quantum; o restante do núcleo, experimentos e
-relatório PDF continuam pendentes.
+autorizada executa instruções e quantum; a segunda implementa filas, política de
+créditos e operações de espera de E/S. A integração ao laço, o restante do núcleo,
+experimentos e relatório PDF continuam pendentes.
 
 ## Estado atual por módulo
 
@@ -20,7 +23,7 @@ relatório PDF continuam pendentes.
 | `modelos`, `erros` | Instruções, BCP, IDs, estados, resultados e erros | Ajustes somente se exigidos pelo núcleo |
 | `carregador` | Leitura e validação de programas, prioridades e quantum | Integração com a simulação |
 | `tabela_processos` | Posse dos BCPs, inserção sem sobrescrever PID, consulta e remoção | Uso pelo laço de simulação |
-| `filas`, `politica` | Estruturas de IDs e contratos documentados | Ordenação, seleção, reinserção, E/S e créditos |
+| `filas`, `politica` | Carga, seleção, reordenação, reinserções, bloqueio, avanço de esperas, desconto e redistribuição de créditos | Integração com transições e laço de simulação |
 | `interpretador` | Atribuições, COM, E/S, SAIDA, validação e avanço único do PC | Integração com o laço de simulação |
 | `simulador` | Quantum limitado, contagem, paradas e propagação de erros | Laço de simulação, despacho, transições e tempo lógico |
 | `estatisticas` | Contratos de coleta e médias | Contadores e cálculo D/P e I/D |
@@ -44,14 +47,20 @@ verificam a recusa; não demonstram que a simulação funciona.
 - Créditos começam na prioridade, caem uma vez por despacho sem ficar negativos
   e só são redistribuídos quando todos os ativos, inclusive bloqueados, têm zero.
 - Desempates, reinserções e exceções FIFO seguem as convenções do README e do EP.
+  Seleção não altera estado: o laço futuro define Executando e recoloca Pronto antes
+  de reinserir. Filas validam existência, estado e duplicidade antes de modificar.
 - E/S espera dois surtos posteriores; o surto que bloqueia não reduz a própria espera.
-  Ociosidade avança somente a espera lógica, sem instruções, créditos ou despachos.
+  As operações implementadas validam o snapshot anterior integralmente, descontam
+  somente seus IDs e liberam elegíveis na ordem FIFO da fila. O laço futuro deve
+  aplicar isso ao fim dos surtos; em ociosidade, avançar somente a espera lógica,
+  sem instruções, créditos ou despachos.
 - Manter o escopo essencial: sem CLI configurável, lote automático, CSV, threads,
   tempo real, `unsafe`, resultados experimentais inventados ou relatório fictício.
 - Usar o fluxo Superpowers detalhado no AGENTS. Plano e registros recuperados
   de `58835cb` são históricos; o plano `docs/superpowers/plans/2026-10-10-contexto-atual.md`
   orienta as próximas entregas. O [plano da primeira etapa](docs/superpowers/plans/2026-10-10-etapa1-interpretador-quantum.md)
-  registra o recorte autorizado; as etapas restantes exigem novo pedido.
+  registra o recorte CPU; o [plano da segunda etapa](docs/superpowers/plans/2026-10-10-etapa2-filas-politica.md)
+  registra filas, política e esperas. As etapas restantes exigem novo pedido.
 
 ## Sequência proposta de implementação e verificação
 
@@ -59,9 +68,11 @@ verificam a recusa; não demonstram que a simulação funciona.
 - [x] Implementar interpretador e quantum; testes de atribuições, COM, PC único,
   retomada após E/S, SAIDA, fronteiras, quantum zero e erros com progresso válido
   aprovados pelo autor; revisão independente de conformidade e qualidade sem achados.
-- [ ] Primeiro próximo passo proposto: implementar filas e política; testar empates, reinserções, desconto saturado,
-  bloqueados com crédito, redistribuição de todos os ativos e prioridades zero.
-- [ ] Implementar transições e E/S; testar dois surtos posteriores, surtos curtos,
+- [x] Implementar filas, política e operações de espera de E/S; testes de empates,
+  reinserções, desconto saturado, bloqueados com crédito, redistribuição, prioridades
+  zero, snapshots, liberação FIFO e erros sem mutação aprovados; revisão independente
+  de conformidade e qualidade sem achados.
+- [ ] Próximo passo proposto: integrar transições e E/S ao laço; testar dois surtos posteriores, surtos curtos,
   surtos consecutivos do mesmo PID, liberações FIFO e ausência de IDs duplicados.
 - [ ] Integrar simulação; testar término com tabela vazia e ociosidade sem consumo
   de instruções, créditos ou despachos.
@@ -83,7 +94,9 @@ proposta de validação, não uma funcionalidade adicional prometida.
 | 2026-10-10 | `ffc8849` | Simplificação para a base essencial do EP1; núcleo permanece reservado. |
 | 2026-10-10 | `748077f` | Criação deste acompanhamento, link no README e regra de manutenção no AGENTS. |
 | 2026-10-10 | Entrega sobre `748077f` | Recuperação do acervo Superpowers de `58835cb`, fluxo detalhado no AGENTS e plano adaptado ao contexto atual. |
-| 2026-10-10 | Entrega sobre a base `4210a1c` | Primeira etapa na branch `codex/etapa1-interpretador-quantum`: interpretador e quantum com TDD real e revisão independente; contexto atualizado, restante do núcleo pendente. |
+| 2026-10-10 | `7b92a6a` | Primeira etapa de interpretador e quantum com TDD real e revisão independente, integrada à `main`; restante do núcleo pendente. |
+| 2026-10-10 | Entrega sem commit sobre `7b92a6a` | Segunda etapa na branch `codex/etapa2-filas-politica`: filas, política de créditos e operações de espera de E/S com TDD real e revisão independente; integração ao laço pendente. |
+| 2026-10-11 | Trabalho sobre `7b92a6a` | Revisão pré-commit, stage e commit da segunda etapa autorizados na branch atual, condicionados à conferência do conjunto. Boilerplate local excluído do rastreio Git e protegido por regra em `.gitignore`; verificações de código e revisão independente pré-commit aprovadas. |
 
 Verificação da entrega `748077f`: `cargo check --all-targets`, `cargo fmt --check`,
 `cargo clippy --all-targets -- -D warnings` e `git diff --check` aprovados;
@@ -104,7 +117,7 @@ próprios e conferência de whitespace nesses arquivos aprovadas. Revisão indep
 de conformidade e qualidade da Task 1 aprovada sem achados. São evidências do recorte
 CPU e dos contratos restantes, não resultados experimentais nem simulação implementada.
 
-Verificação final desta entrega executada pelo coordenador: `cargo check --all-targets`,
+Verificação final da primeira etapa executada pelo coordenador: `cargo check --all-targets`,
 `cargo test`, `cargo fmt --check`, `cargo clippy --all-targets -- -D warnings` e
 `git diff --check` aprovados. Testes: 39 aprovados, zero falhas e zero ignorados
 (14 no alvo `simulador`, incluindo o contrato de recusa); alvos unitários e doc-tests
@@ -114,7 +127,7 @@ locais permanecem intactos. Execução: código 1, stdout vazio e stderr
 `Não implementado: laço de simulação, despacho e transições de processos`, sem logs
 antes ou depois. Revisões independentes da documentação e do conjunto aprovadas em conformidade e
 qualidade, sem achados críticos, importantes ou menores. Nenhuma correção de CPU
-necessária; filas e política continuam como próximo passo proposto.
+necessária; naquele momento, filas e política eram o próximo passo proposto.
 
 Após concluir a implementação, o usuário autorizou preparar o stage das alterações
 da etapa, excluindo `BOILERPLATE_EP1_ESCALONADOR.md`, revisar novamente e criar o
@@ -124,8 +137,44 @@ nova revisão e verificação foram conferidos pelo coordenador: revisão antes 
 commit aprovada em conformidade e qualidade, sem achados; check, testes (39/0/0),
 fmt, Clippy e conferência do diff em stage aprovados. Nove arquivos da etapa em
 stage, sem PDF ou boilerplate; entradas, acervo e documentos locais intactos.
-Execução com código 1, stdout vazio, pendência explícita e sem logs. Entrega apta
-para o commit autorizado; nenhum hash é antecipado.
+Execução com código 1, stdout vazio, pendência explícita e sem logs. O commit autorizado foi criado como `7b92a6a` e integrado à `main`.
+
+## Verificação da segunda etapa
+
+O autor do núcleo registrou RED comportamental real em grupos de política, carga e
+seleção, reinserções, bloqueio e avanço de esperas. GREEN final dos alvos `filas` e
+`politica`: 23 aprovados, zero falhas e zero ignorados; suíte completa: 59/0/0.
+Clippy focado detectou `unnecessary_map_or`; após depuração e correção, passou sem
+warnings. Revisão independente de conformidade e qualidade do núcleo aprovada sem achados.
+
+Verificações executadas pelo coordenador após cessarem as edições do núcleo:
+`cargo check --all-targets`, `cargo test`, `cargo fmt --check`,
+`cargo clippy --all-targets -- -D warnings` e `git diff --check` aprovados.
+Testes: 59 aprovados, zero falhas e zero ignorados; os contratos pendentes de
+simulação e estatísticas continuam sendo testes de recusa. `cargo run --bin Escalonador`
+encerrou com código 1 e `Não implementado: laço de simulação, despacho e transições de processos`,
+sem logs. Os 12 arquivos oficiais conferem byte a byte com `7b92a6a`;
+CPU, execução, estatísticas e registro permaneceram intactos. Não foram produzidos
+resultados de simulação ou experimentos. Naquela verificação, a segunda etapa estava
+sem stage, commit, push ou merge; a integração das transições e do laço ainda exige novo pedido.
+
+Em 2026-10-11, o usuário autorizou revisar o conjunto, preparar o stage e criar o
+commit da segunda etapa na branch atual se tudo estiver correto. Essa autorização
+substitui a condição anterior de trabalho sem stage ou commit; não amplia o escopo
+do núcleo. Também autorizou excluir `BOILERPLATE_EP1_ESCALONADOR.md` do rastreio Git,
+preservando o arquivo local. O arquivo já não era versionado e recebeu a regra
+`/BOILERPLATE_EP1_ESCALONADOR.md` em `.gitignore`; `git check-ignore` confirmou que
+o arquivo está ignorado.
+
+Verificações pré-commit executadas pelo coordenador em 2026-10-11:
+`cargo check --all-targets`, `cargo test`, `cargo fmt --check` e
+`cargo clippy --all-targets -- -D warnings` aprovados. Testes: 59 aprovados, zero
+falhas e zero ignorados. Os 12 arquivos oficiais conferem byte a byte com HEAD.
+A execução encerrou com código 1, stdout vazio, stderr com a pendência explícita
+do laço de simulação e sem logs. Revisão independente pré-commit de conformidade
+e qualidade aprovada, sem achados críticos, importantes ou menores. A conferência
+exata do stage cabe ao coordenador antes do commit; nenhum novo hash de commit é
+registrado aqui.
 
 ## Como manter
 

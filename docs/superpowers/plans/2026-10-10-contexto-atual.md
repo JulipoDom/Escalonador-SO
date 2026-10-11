@@ -1,15 +1,15 @@
 # Contexto atual — estado e próximas etapas
 
-> **Para agentes:** ao executar trabalho autorizado, usar `superpowers:subagent-driven-development` por tarefa; `superpowers:executing-plans` é alternativa quando a delegação estiver indisponível. A etapa CPU marcada abaixo tem evidência de implementação; as caixas abertas indicam trabalho futuro.
+> **Para agentes:** ao executar trabalho autorizado, usar `superpowers:subagent-driven-development` por tarefa; `superpowers:executing-plans` é alternativa quando a delegação estiver indisponível. As etapas CPU e filas/política marcadas abaixo têm evidência de implementação; as caixas abertas indicam trabalho futuro.
 
-**Objetivo:** registrar a primeira etapa autorizada e orientar as próximas implementações do EP1 de 2026 sem ampliar o escopo.
-**Arquitetura:** a tabela possui os BCPs; filas guardam somente `ProcessId`. Interpretador e quantum executam sobre um BCP; as partes restantes do núcleo retornam `ErroEp::NaoImplementado` específico. Modelos, carregamento e escrita de eventos fornecidos já têm base implementada.
+**Objetivo:** registrar as duas etapas autorizadas e orientar as próximas implementações do EP1 de 2026 sem ampliar o escopo.
+**Arquitetura:** a tabela possui os BCPs; filas guardam somente `ProcessId`. Interpretador e quantum executam sobre um BCP; filas, política de créditos e operações de espera de E/S estão implementadas; as partes restantes do núcleo retornam `ErroEp::NaoImplementado` específico. Modelos, carregamento e escrita de eventos fornecidos já têm base implementada.
 **Tecnologia:** Rust stable, edição 2021, Cargo e somente `std`.
 **Fontes:** [enunciado de 2026](../../../ep1.pdf), [README](../../../README.md), [AGENTS](../../../AGENTS.md) e [HISTORICO](../../../HISTORICO.md). O enunciado de 2026 prevalece sobre documentos antigos; está em `ep1.pdf` na raiz do projeto.
 
 ## Limites e estado
 
-- A primeira etapa de interpretador e quantum foi autorizada e implementada conforme o [plano específico](2026-10-10-etapa1-interpretador-quantum.md). Este roteiro não autoriza as etapas restantes.
+- A primeira etapa de interpretador e quantum foi autorizada e implementada conforme o [plano específico](2026-10-10-etapa1-interpretador-quantum.md). Foi integrada à `main` no commit `7b92a6a`. A segunda etapa implementa filas, política e operações de espera de E/S conforme o [plano específico](2026-10-10-etapa2-filas-politica.md), na branch `codex/etapa2-filas-politica`, ainda sem commit. Este roteiro não autoriza as etapas restantes.
 - A CPU preserva identidade, programa, estado, prioridade, créditos e espera. PC inválido retorna `EstadoInvalido` sem mutação da instrução inválida; quantum zero retorna `Entrada` antes de ler PC. E/S e SAIDA contam e prevalecem sobre o limite; erros posteriores preservam progresso válido.
 - Sem CLI configurável, lote automático, CSV, `unsafe`, threads ou tempo real.
 - Preservar byte a byte os 12 arquivos oficiais em `programas/`.
@@ -32,8 +32,8 @@
 ## Sequência proposta após autorização
 
 - [x] **Interpretador e quantum:** `src/interpretador.rs`, `src/simulador.rs` e `tests/simulador.rs` implementados sem alterar contratos de modelos. TDD real com atribuições, COM, PC único, E/S e SAIDA contadas, retomadas, fronteiras, quantum zero e erros com progresso válido. Autor: 14 testes no alvo `simulador` e 39 na suíte aprovados, zero falhas/ignorados; revisão independente sem achados. Verificações finais do coordenador e revisões independentes de documentação e conjunto aprovadas, sem achados, registradas no HISTORICO.
-- [ ] **Filas e política — primeiro próximo passo proposto:** editar `src/filas.rs`, `src/politica.rs` e `tests/politica.rs`; consumir IDs da tabela. Testar empates, reinserções, desconto saturado por despacho, bloqueados com crédito, prioridades zero e redistribuição quando todos os ativos zerarem.
-- [ ] **Transições e E/S:** depois de interpretador e filas, editar `src/simulador.rs` e `tests/simulador.rs`. Testar espera de dois surtos posteriores, surto que bloqueia sem descontar a própria espera, surtos curtos, repetição do PID, liberações FIFO e ausência de IDs duplicados.
+- [x] **Filas, política e operações de espera de E/S:** `src/filas.rs`, `src/politica.rs`, `tests/filas.rs` e `tests/politica.rs` implementados com TDD real. Carga, seleção e reordenação estável; reinserções antes/depois de iguais e exceções FIFO; desconto saturado e redistribuição de todos os ativos; bloqueio com espera 2, avanço apenas de snapshot anterior e liberação FIFO. Validações antes da mutação e seleção sem alterar estado. Revisão independente de conformidade e qualidade sem achados. Coordenador: check, 59 testes aprovados (zero falhas/ignorados), fmt e Clippy aprovados; execução ainda recusa o laço, sem logs, e 12 entradas idênticas à base `7b92a6a`.
+- [ ] **Integração de transições e E/S — próximo passo proposto:** consumir as operações já implementadas e editar `src/simulador.rs` e `tests/simulador.rs`. Testar na execução integrada espera de dois surtos posteriores, surto que bloqueia sem descontar a própria espera, surtos curtos, repetição do PID, liberações FIFO e ausência de IDs duplicados. O laço deve definir Executando no despacho e Pronto antes de reinserir; em ociosidade, aplicar avanço lógico com snapshot da fila, sem CPU nem desconto de crédito.
 - [ ] **Laço de simulação:** integrar os contratos anteriores em `src/simulador.rs`; testar tabela vazia ao término e ociosidade que avança espera lógica sem instruções, créditos ou despachos.
 - [ ] **Estatísticas e logs reais:** depois do laço, editar `src/estatisticas.rs`, `src/registro.rs` e `tests/registro_estatisticas.rs`. Testar D/P e I/D em ponto flutuante, denominadores definidos, E/S e SAIDA contadas, despachos repetidos e propagação de falhas de escrita.
 - [ ] **Execução integrada:** somente com núcleo funcional, editar `src/main.rs` e `tests/execucao.rs` para produzir eventos e resumo provenientes da simulação. Atualizar o teste de recusa apenas quando a integração real o substituir.
