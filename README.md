@@ -2,6 +2,8 @@
 
 Base do EP1 de Sistemas Operacionais de 2026 em Rust stable, edição 2021, com Cargo e somente a biblioteca padrão. `programas/` preserva os 12 arquivos oficiais: dez processos, `prioridades.txt` e `quantum.txt`.
 
+Estado, decisões e próximos passos: [Histórico do projeto](HISTORICO.md).
+
 Execute na raiz deste projeto (`ep1-escalonador/`), onde está `programas/`:
 
 ```bash
