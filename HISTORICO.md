@@ -1,11 +1,11 @@
 # Histórico e acompanhamento do EP1
 
-Última conferência: **2026-10-11**, base Git `7b92a6a`, primeira etapa integrada à `main`.
-Trabalho atual: segunda etapa de filas, política de créditos e operações de espera de E/S
-na branch `codex/etapa2-filas-politica`, implementada e revisada nesta entrega,
-autorizada para stage e commit na branch atual. Verificação do código e revisão
-independente pré-commit em 2026-10-11 aprovadas sem achados; a conferência exata
-do stage cabe ao coordenador antes do commit. Evidências registradas abaixo.
+Última conferência: **2026-10-11**, base Git `8d4d172` na `main`.
+Estado atual: segunda etapa de filas, política de créditos e operações de espera
+de E/S registrada no commit `8d4d172` e integrada localmente à `main` por
+fast-forward em 2026-10-11, sem push. Verificações e revisão independente
+pré-commit aprovadas; suíte pós-merge com 59 aprovados, zero falhas e zero
+ignorados. Integração ao laço de simulação continua pendente.
 
 ## Objetivo e escopo
 
@@ -97,6 +97,7 @@ proposta de validação, não uma funcionalidade adicional prometida.
 | 2026-10-10 | `7b92a6a` | Primeira etapa de interpretador e quantum com TDD real e revisão independente, integrada à `main`; restante do núcleo pendente. |
 | 2026-10-10 | Entrega sem commit sobre `7b92a6a` | Segunda etapa na branch `codex/etapa2-filas-politica`: filas, política de créditos e operações de espera de E/S com TDD real e revisão independente; integração ao laço pendente. |
 | 2026-10-11 | Trabalho sobre `7b92a6a` | Revisão pré-commit, stage e commit da segunda etapa autorizados na branch atual, condicionados à conferência do conjunto. Boilerplate local excluído do rastreio Git e protegido por regra em `.gitignore`; verificações de código e revisão independente pré-commit aprovadas. |
+| 2026-10-11 | `8d4d172` | Segunda etapa registrada após revisão e conferência do stage, integrada localmente à `main` por fast-forward autorizado, sem push; suíte pós-merge aprovada com 59/0/0. |
 
 Verificação da entrega `748077f`: `cargo check --all-targets`, `cargo fmt --check`,
 `cargo clippy --all-targets -- -D warnings` e `git diff --check` aprovados;
@@ -172,9 +173,14 @@ Verificações pré-commit executadas pelo coordenador em 2026-10-11:
 falhas e zero ignorados. Os 12 arquivos oficiais conferem byte a byte com HEAD.
 A execução encerrou com código 1, stdout vazio, stderr com a pendência explícita
 do laço de simulação e sem logs. Revisão independente pré-commit de conformidade
-e qualidade aprovada, sem achados críticos, importantes ou menores. A conferência
-exata do stage cabe ao coordenador antes do commit; nenhum novo hash de commit é
-registrado aqui.
+e qualidade aprovada, sem achados críticos, importantes ou menores. O coordenador
+conferiu os 11 arquivos exatos em stage e criou o commit autorizado `8d4d172` na
+branch `codex/etapa2-filas-politica`.
+
+Após autorização do usuário, o coordenador integrou a segunda etapa localmente
+à `main` por fast-forward de `7b92a6a` para `8d4d172`, sem push. A suíte executada
+após o merge teve 59 aprovados, zero falhas e zero ignorados. Não houve nova
+implementação; transições e laço de simulação permanecem pendentes.
 
 ## Como manter
 
