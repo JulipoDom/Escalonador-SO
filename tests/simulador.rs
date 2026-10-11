@@ -272,14 +272,14 @@ fn quantum_propaga_erro_ao_esgotar_texto_preservando_progresso_valido() {
 }
 
 #[test]
-fn simulacao_pendente_nao_produz_eventos_ou_resumo() {
+fn simulacao_rejeita_contexto_executando_antes_de_produzir_eventos() {
     let diretorio = std::env::temp_dir().join(format!("ep1-cpu-{}", std::process::id()));
     std::fs::create_dir(&diretorio).unwrap();
     let resultado = || {
         let mut registro = RegistroLog::criar(&diretorio, 3).unwrap();
         assert!(matches!(
             simular(vec![processo(Instrucao::Com)], 3, &mut registro),
-            Err(ErroEp::NaoImplementado(_))
+            Err(ErroEp::EstadoInvalido(_))
         ));
         registro.finalizar().unwrap();
         assert_eq!(std::fs::read(diretorio.join("log03.txt")).unwrap(), b"");

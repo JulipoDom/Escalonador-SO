@@ -126,20 +126,102 @@ fn falha_de_flush_e_propagada() {
     assert!(matches!(log.finalizar(), Err(ErroEp::Io(_))));
 }
 #[test]
-fn metricas_permanecem_pendentes() {
+fn calcula_medias_com_divisao_fracionaria() {
+    let r = calcular_resumo(3, 2, 15, 6).unwrap();
+    assert_eq!(r.quantum, 3);
+    assert_eq!(r.total_processos, 2);
+    assert_eq!(r.total_instrucoes, 15);
+    assert_eq!(r.total_despachos, 6);
+    assert_eq!(r.media_trocas, 3.0);
+    assert_eq!(r.media_instrucoes, 2.5);
+    let r = calcular_resumo(3, 2, 4, 3).unwrap();
+    assert_eq!(r.media_trocas, 1.5);
+    assert_eq!(r.media_instrucoes, 4.0 / 3.0);
+}
+#[test]
+fn calculo_rejeita_denominadores_zero() {
+    for (p, d) in [(0, 6), (2, 0)] {
+        assert!(matches!(
+            calcular_resumo(3, p, 15, d),
+            Err(ErroEp::EstadoInvalido(_))
+        ));
+    }
+}
+#[test]
+fn calculo_rejeita_quantum_zero() {
     assert!(matches!(
-        calcular_resumo(3, 2, 15, 6),
-        Err(ErroEp::NaoImplementado("cálculo das médias D/P e I/D"))
+        calcular_resumo(0, 2, 15, 6),
+        Err(ErroEp::Entrada(_))
     ));
-    let q = ResultadoQuantum {
+}
+#[test]
+fn registra_surtos_com_todos_os_motivos_e_pid_repetido() {
+    let mut e = Estatisticas::default();
+    for motivo in [MotivoParada::Quantum, MotivoParada::Es, MotivoParada::Saida] {
+        e.registrar(&ResultadoQuantum {
+            pid: ProcessId(1),
+            instrucoes_executadas: 2,
+            motivo,
+        })
+        .unwrap();
+    }
+    let r = e.resumo(3, 2).unwrap();
+    assert_eq!(r.total_despachos, 3);
+    assert_eq!(r.total_instrucoes, 6);
+    assert_eq!(r.media_trocas, 1.5);
+    assert_eq!(r.media_instrucoes, 2.0);
+}
+#[test]
+fn registro_rejeita_surto_sem_instrucao() {
+    let mut e = Estatisticas::default();
+    assert!(matches!(
+        e.registrar(&ResultadoQuantum {
+            pid: ProcessId(1),
+            instrucoes_executadas: 0,
+            motivo: MotivoParada::Quantum,
+        }),
+        Err(ErroEp::EstadoInvalido(_))
+    ));
+}
+
+#[test]
+fn resumo_de_contadores_vazios_nao_inventa_medias() {
+    let e = Estatisticas::default();
+    assert!(matches!(e.resumo(3, 2), Err(ErroEp::EstadoInvalido(_))));
+}
+#[test]
+fn resumo_dos_contadores_valida_quantum_e_processos() {
+    let mut e = Estatisticas::default();
+    e.registrar(&ResultadoQuantum {
         pid: ProcessId(1),
-        instrucoes_executadas: 3,
+        instrucoes_executadas: 2,
+        motivo: MotivoParada::Saida,
+    })
+    .unwrap();
+    assert!(matches!(e.resumo(0, 1), Err(ErroEp::Entrada(_))));
+    assert!(matches!(e.resumo(3, 0), Err(ErroEp::EstadoInvalido(_))));
+    let r = e.resumo(3, 1).unwrap();
+    assert_eq!(r.total_despachos, 1);
+    assert_eq!(r.total_instrucoes, 2);
+}
+#[test]
+fn surto_invalido_nao_altera_resumo_anterior() {
+    let mut e = Estatisticas::default();
+    e.registrar(&ResultadoQuantum {
+        pid: ProcessId(1),
+        instrucoes_executadas: 2,
         motivo: MotivoParada::Quantum,
-    };
+    })
+    .unwrap();
     assert!(matches!(
-        Estatisticas.registrar(&q),
-        Err(ErroEp::NaoImplementado(
-            "coleta de despachos e instruções executadas"
-        ))
+        e.registrar(&ResultadoQuantum {
+            pid: ProcessId(1),
+            instrucoes_executadas: 0,
+            motivo: MotivoParada::Es
+        }),
+        Err(ErroEp::EstadoInvalido(_))
     ));
+    let r = e.resumo(3, 1).unwrap();
+    assert_eq!(r.total_despachos, 1);
+    assert_eq!(r.total_instrucoes, 2);
 }

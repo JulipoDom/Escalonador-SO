@@ -1,11 +1,12 @@
-//! Execução de quantum, passo de escalonamento e laço completo do núcleo.
+//! Execução de quantum, laço do núcleo e simulação com eventos e estatísticas reais.
 use crate::{
     erros::ErroEp,
+    estatisticas::Estatisticas,
     filas::{FilaBloqueados, FilaProntos},
     interpretador::executar_instrucao,
     modelos::{Bcp, EstadoProcesso, MotivoParada, ProcessId, ResultadoQuantum, ResultadoSimulacao},
     politica::{descontar_credito, redistribuir_se_necessario},
-    registro::RegistroLog,
+    registro::{EventoLog, RegistroLog},
     tabela_processos::TabelaProcessos,
 };
 use std::collections::{HashMap, HashSet};
@@ -33,6 +34,17 @@ pub fn executar_passo(
     bloqueados: &mut FilaBloqueados,
     quantum: usize,
 ) -> Result<ResultadoPasso, ErroEp> {
+    executar_passo_com_despacho(tabela, prontos, bloqueados, quantum, |_| Ok(()))
+}
+
+/// Observa o despacho real antes da CPU, inclusive quando ela retorna erro.
+fn executar_passo_com_despacho(
+    tabela: &mut TabelaProcessos,
+    prontos: &mut FilaProntos,
+    bloqueados: &mut FilaBloqueados,
+    quantum: usize,
+    mut ao_despachar: impl FnMut(&Bcp) -> Result<(), ErroEp>,
+) -> Result<ResultadoPasso, ErroEp> {
     if quantum == 0 {
         return Err(ErroEp::Entrada("quantum deve ser positivo".into()));
     }
@@ -56,6 +68,7 @@ pub fn executar_passo(
         .get_mut(pid)
         .expect("PID selecionado da tabela validada");
     bcp.estado = EstadoProcesso::Executando;
+    ao_despachar(bcp)?;
     let resultado = executar_quantum(bcp, quantum)?;
     let terminado = match resultado.motivo {
         MotivoParada::Quantum => {
@@ -192,15 +205,79 @@ pub fn executar_laco(
     }
 }
 
-/// Integração reservada do laço com estatísticas e registro.
-/// O núcleo está disponível em `executar_laco`; esta API exige também resumo
-/// e eventos reais. Retorna erro antes de executar ou escrever qualquer evento.
+/// Executa o núcleo, registra os eventos reais e devolve contagens e contexto final.
+/// Valida a entrada antes de escrever; entrada vazia tem denominadores indefinidos.
+/// Erros abortam sem resumo de sucesso, preservando eventos já publicados.
 pub fn simular(
-    _processos: Vec<Bcp>,
-    _quantum: usize,
-    _registro: &mut RegistroLog,
+    processos: Vec<Bcp>,
+    quantum: usize,
+    registro: &mut RegistroLog,
 ) -> Result<ResultadoSimulacao, ErroEp> {
-    Err(ErroEp::NaoImplementado(
-        "integração do laço com estatísticas e registro",
-    ))
+    if quantum == 0 {
+        return Err(ErroEp::Entrada("quantum deve ser positivo".into()));
+    }
+    let total_processos = processos.len();
+    if total_processos == 0 {
+        return Err(ErroEp::EstadoInvalido(
+            "simulação exige ao menos um processo para calcular as médias".into(),
+        ));
+    }
+    let mut tabela = TabelaProcessos::nova();
+    for bcp in processos {
+        tabela.inserir(bcp)?;
+    }
+    let mut prontos = FilaProntos::nova();
+    prontos.ordenar_inicial(&tabela)?;
+    let mut bloqueados = FilaBloqueados::nova();
+    validar_estado(&tabela, &prontos, &bloqueados)?;
+    for pid in prontos.ids() {
+        let bcp = tabela.get(*pid).expect("fila inicial validada");
+        registro.registrar(EventoLog::Carregando(&bcp.programa.nome))?;
+    }
+    let mut estatisticas = Estatisticas::default();
+    let mut registradores_finais = HashMap::new();
+    loop {
+        let passo = executar_passo_com_despacho(
+            &mut tabela,
+            &mut prontos,
+            &mut bloqueados,
+            quantum,
+            |bcp| registro.registrar(EventoLog::Executando(&bcp.programa.nome)),
+        )?;
+        match passo {
+            ResultadoPasso::Surto {
+                resultado,
+                terminado,
+            } => {
+                estatisticas.registrar(&resultado)?;
+                if let Some(bcp) = terminado {
+                    registro.registrar(EventoLog::Terminado {
+                        nome: &bcp.programa.nome,
+                        x: bcp.x,
+                        y: bcp.y,
+                    })?;
+                    registradores_finais.insert(bcp.pid, (bcp.x, bcp.y));
+                } else {
+                    let bcp = tabela.get(resultado.pid).expect("surto de processo ativo");
+                    if resultado.motivo == MotivoParada::Es {
+                        registro.registrar(EventoLog::EntradaSaida(&bcp.programa.nome))?;
+                    }
+                    registro.registrar(EventoLog::Interrompendo {
+                        nome: &bcp.programa.nome,
+                        instrucoes: resultado.instrucoes_executadas,
+                    })?;
+                }
+            }
+            ResultadoPasso::Ocioso { .. } => {}
+            ResultadoPasso::Concluido => {
+                let resumo = estatisticas.resumo(quantum, total_processos)?;
+                registro.escrever_resumo(&resumo)?;
+                registro.finalizar()?;
+                return Ok(ResultadoSimulacao {
+                    resumo,
+                    registradores_finais,
+                });
+            }
+        }
+    }
 }

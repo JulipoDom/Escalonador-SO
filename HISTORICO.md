@@ -1,20 +1,22 @@
 # Histórico e acompanhamento do EP1
 
-Última conferência: **2026-10-11**, base Git `434f43b`, branch `main`.
-Estado atual: código e testes da quarta etapa registrados em `75941d0` e contextos
-em `05bc657`, integrados localmente à `main` por fast-forward autorizado de
-`94a9482`. Após autorização do usuário, a publicação em `origin/main` foi concluída
-até `434f43b`. Suíte pós-merge com 92 aprovados, zero falhas e zero ignorados.
-`executar_laco` consome os passos até a conclusão e devolve
-os registradores finais reais por PID. Revisões independentes de conformidade e
-qualidade do núcleo aprovadas sem achados; suíte com 92 aprovados, zero falhas e
-zero ignorados. As revisões documental e final desta entrega foram aprovadas em conformidade e
-qualidade, sem achados críticos, importantes ou menores.
-A terceira etapa foi registrada em `57099c4` e integrada localmente à `main`
-por fast-forward autorizado de `7ced42f`, naquele momento sem push, com 77/0/0 pós-merge.
-A segunda etapa foi registrada em `8d4d172`, integrada e publicada na `main`;
-o enunciado `ep1.pdf` foi incluído como contexto em `7336c37`. Estatísticas,
-logs reais, `simular` com resumo/registro e integração de `main` continuam pendentes.
+Última conferência: **2026-10-11**, base Git `eddae3c`, branch `codex/etapa5-logs-estatisticas`.
+Estado atual: quinta etapa implementada; os 11 arquivos foram colocados em stage
+pelo usuário, que autorizou commit e merge local na `main`. Última revisão
+pré-commit aprovada em conformidade e qualidade sem achados; nova verificação
+do coordenador aprovada com check, suíte 111/0/0, fmt e Clippy. Commit e merge
+ainda pendentes. Sem pedido de push. Na API, `simular` produz eventos, estatísticas, resumo e registradores
+finais reais, preservando o contrato de `executar_laco`. A suíte do autor do núcleo
+teve 111 aprovados, zero falhas e zero ignorados. Revisão independente de
+conformidade e qualidade da saída e do núcleo aprovadas sem achados;
+verificações do coordenador aprovadas: check, suíte 111/0/0, fmt em modo check,
+Clippy e diff check. Revisão documental e final do conjunto aprovada em conformidade e qualidade, sem achados críticos, importantes ou menores.
+A execução principal integrada, os experimentos e o relatório PDF permanecem pendentes.
+
+As etapas anteriores permanecem registradas: quarta etapa em `75941d0`, contextos
+em `05bc657`, integrados à `main` por fast-forward autorizado de `94a9482`, com
+92/0/0 pós-merge; publicação autorizada concluída até `434f43b`. Terceira etapa em
+`57099c4`, segunda em `8d4d172` e enunciado `ep1.pdf` em `7336c37`.
 
 ## Objetivo e escopo
 
@@ -23,9 +25,9 @@ Implementar o escalonador do EP1 de Sistemas Operacionais de **2026**, conforme
 A base atual preserva os 12 arquivos oficiais em `programas/`. A primeira etapa
 autorizada executa instruções e quantum; a segunda implementa filas, política de
 créditos e operações de espera de E/S; a terceira integra despacho, transições e
-ociosidade em um passo; a quarta completa o laço do núcleo até a conclusão.
-Estatísticas, logs reais, execução principal integrada, experimentos e relatório
-PDF continuam pendentes.
+ociosidade em um passo; a quarta completa o laço do núcleo até a conclusão; a
+quinta integra estatísticas e logs reais na API `simular`, sem consumir essa API
+em `main`. Execução principal integrada, experimentos e relatório PDF continuam pendentes.
 
 ## Estado atual por módulo
 
@@ -36,16 +38,17 @@ PDF continuam pendentes.
 | `tabela_processos` | Posse dos BCPs, inserção sem sobrescrever PID, consulta e remoção, usadas pelo laço | — |
 | `filas`, `politica` | Carga, seleção, reordenação, reinserções, bloqueio, avanço de esperas, desconto e redistribuição de créditos, consumidos pelo passo e pelo laço | — |
 | `interpretador` | Atribuições, COM, E/S, SAIDA, validação e avanço único do PC, consumidos pelo laço | — |
-| `simulador` | Quantum, passo integrado e `executar_laco` até a conclusão, com mapa de registradores finais reais | `simular` com resumo e registro reais |
-| `estatisticas` | Contratos de coleta e médias | Contadores e cálculo D/P e I/D |
-| `registro` | Escrita de eventos e resumo fornecido, com erros de escrita propagados | Eventos e valores reais produzidos pelo núcleo |
+| `simulador` | Quantum, passo, `executar_laco` e `simular` com eventos, resumo e registradores finais reais | Integração principal |
+| `estatisticas` | Contadores de despachos concluídos e instruções; médias D/P e I/D em f64, com denominadores validados e overflow sem mutação parcial | — |
+| `registro` | Escritor preservado, consumido por `simular` com eventos e resumo reais; falhas de escrita/publicação propagadas | Criação do log pela execução principal |
 | `main` | Recusa argumentos, valida `programas/` no diretório corrente | Integrar simulação, log e resumo reais |
 
-`simular` e estatísticas retornam `ErroEp::NaoImplementado` específico. A execução
-atual não chama o laço: após validar a entrada, falha com
-`Não implementado: integração da simulação com estatísticas e logs` e não cria logs.
-Testes desses contratos verificam a recusa; os testes de `executar_laco` comprovam
-a conclusão do núcleo e os registradores finais, sem integrar resumo ou registro.
+`simular` está implementada; o contrato pendente permanece somente na execução
+principal. `main` não foi alterado: após validar a entrada, falha com código 1,
+stdout vazio e `Não implementado: integração da simulação com estatísticas e logs`,
+sem criar logs. A mensagem preservada descreve a integração principal pendente;
+não descreve uma recusa da API. Testes de recusa do binário e testes da saída real
+de `simular` verificam contratos diferentes.
 
 ## Decisões vigentes
 
@@ -78,7 +81,19 @@ a conclusão do núcleo e os registradores finais, sem integrar resumo ou regist
   limite artificial. Captura os registradores dos BCPs terminados por PID; entrada
   vazia com quantum positivo devolve mapa vazio. Quantum zero é recusado antes
   da preparação; erros são propagados, inclusive após progresso válido. Não coleta
-  eventos ou estatísticas. `simular` permanece reservado antes de executar ou escrever.
+  eventos ou estatísticas. Esse contrato permanece preservado.
+- `simular` valida quantum positivo, entrada não vazia, IDs únicos e estado/espera
+  inicial antes dos eventos. Entrada vazia é recusada pelos denominadores indefinidos.
+  Carregando segue a ordem inicial dos prontos; Executando precede a CPU; E/S
+  precede Interrompendo, cuja contagem é do último surto; SAIDA escreve Terminado
+  com X/Y reais sem interrupção adicional.
+- Estatísticas contam um despacho por surto concluído, inclusive E/S, SAIDA e PID
+  repetido; contam todas as instruções do surto, inclusive E/S e SAIDA. Ociosidade
+  não conta. As médias são D/P e I/D em f64, com P inicial. Zero instruções ou
+  overflow na coleta falham sem mutação parcial dos contadores.
+- Erros de CPU e escrita/publicação são propagados. Eventos reais já publicados
+  podem permanecer; falhas antes da conclusão não escrevem resumo de sucesso.
+  Resumo e publicação final só precedem o retorno de sucesso após a conclusão.
 - Manter o escopo essencial: sem CLI configurável, lote automático, CSV, threads,
   tempo real, `unsafe`, resultados experimentais inventados ou relatório fictício.
 - Usar o fluxo Superpowers detalhado no AGENTS. Plano e registros recuperados
@@ -87,7 +102,8 @@ a conclusão do núcleo e os registradores finais, sem integrar resumo ou regist
   registra o recorte CPU; o [plano da segunda etapa](docs/superpowers/plans/2026-10-10-etapa2-filas-politica.md)
   registra filas, política e esperas; o [plano da terceira etapa](docs/superpowers/plans/2026-10-11-etapa3-transicoes-es.md)
   registra o passo integrado; o [plano da quarta etapa](docs/superpowers/plans/2026-10-11-etapa4-laco-simulacao.md)
-  registra o laço completo. As etapas restantes exigem novo pedido.
+  registra o laço completo; o [plano da quinta etapa](docs/superpowers/plans/2026-10-11-etapa5-logs-estatisticas.md)
+  registra estatísticas e logs reais na API. Integração principal e etapas seguintes exigem novo pedido.
 
 ## Sequência proposta de implementação e verificação
 
@@ -106,10 +122,11 @@ a conclusão do núcleo e os registradores finais, sem integrar resumo ou regist
 - [x] Implementar o laço completo consumindo os passos até a conclusão e devolver
   registradores finais reais; 15 testes novos, incluindo as entradas oficiais,
   aprovados e revisão independente de conformidade e qualidade sem achados.
-- [ ] Próximo passo proposto: coletar estatísticas e integrar logs reais; testar D/P
-  e I/D em ponto flutuante, denominadores, E/S e SAIDA contadas, término e
-  despachos repetidos do mesmo PID.
-- [ ] Integrar `main` somente depois das estatísticas e logs reais, substituindo
+- [x] Coletar estatísticas e integrar logs reais em `simular`; testes de médias,
+  denominadores, E/S/SAIDA, PID repetido, ordem, ociosidade e erros aprovados pelo
+  autor, com suíte 111/0/0. Revisões da saída e do núcleo aprovadas sem achados;
+  verificações do coordenador aprovadas com 111/0/0; revisão documental e final aprovada em conformidade e qualidade, sem achados críticos, importantes ou menores.
+- [ ] Próximo passo proposto: integrar `main` somente depois das estatísticas e logs reais, substituindo
   a recusa pela execução com eventos e resumo reais.
 - [ ] Executar manualmente ao menos dez quantums uniformemente distribuídos em
   intervalo útil; reunir logs, médias, tabelas e gráficos para justificar o quantum no PDF.
@@ -140,6 +157,8 @@ proposta de validação, não uma funcionalidade adicional prometida.
 | 2026-10-11 | `75941d0` | Código e testes do laço completo registrados após autorização de dois commits separados e revisão independente pré-commit sem achados; naquele momento, contextos em preparação para o segundo commit, sem merge ou push. |
 | 2026-10-11 | `05bc657` | Contextos da quarta etapa registrados em commit separado; após autorização do usuário, ambos os commits integrados localmente à `main` por fast-forward de `94a9482`, sem push. Suíte pós-merge aprovada com 92/0/0. |
 | 2026-10-11 | `434f43b` | Após autorização do usuário, publicação dos cinco commits locais em `origin/main` concluída, avançando a remota de `7ced42f` para `434f43b`, incluindo as etapas três e quatro. |
+| 2026-10-11 | Entrega sem commit sobre `eddae3c` | Quinta etapa na branch `codex/etapa5-logs-estatisticas`: estatísticas e logs reais em `simular`, TDD, suíte do autor 111/0/0 e revisões da saída e do núcleo aprovadas sem achados; check, suíte 111/0/0, fmt, Clippy e diff check do coordenador aprovados. Revisão documental e final aprovada em conformidade e qualidade, sem achados críticos, importantes ou menores. Execução principal integrada, experimentos e relatório pendentes. |
+| 2026-10-11 | Trabalho sobre `eddae3c` | Usuário colocou os 11 arquivos da quinta etapa em stage e autorizou commit e merge local na `main`, após última revisão e nova verificação; essas conferências e as operações Git ainda pendentes. Sem pedido de push ou ampliação do escopo. |
 
 Verificação da entrega `748077f`: `cargo check --all-targets`, `cargo fmt --check`,
 `cargo clippy --all-targets -- -D warnings` e `git diff --check` aprovados;
@@ -341,6 +360,71 @@ retornou código 0 e avançou a remota de `7ced42f` para `434f43b`, publicando o
 cinco commits locais, incluindo as etapas três e quatro. A publicação não amplia
 o escopo implementado; estatísticas, logs reais e execução principal integrada
 continuam pendentes. Não houve nova verificação de código neste registro.
+
+## Verificação da quinta etapa
+
+Implementação autorizada pelo usuário em nova branch, criada de `eddae3c`.
+Na entrega anterior ao pedido de commit, não houve stage, commit, merge ou push.
+Saída: contadores privados e soma verificada
+antes de mutar; `Estatisticas::resumo` calcula D/P e I/D em f64. `registro.rs`
+permaneceu intacto. Núcleo: `simular` usa o passo existente com observação privada
+do despacho antes da CPU, sem duplicar a seleção ou a política. Assinaturas
+públicas e contrato de mapa vazio de `executar_laco` preservados; `main` intocado.
+
+Evidência do autor da saída: RED compilável no alvo `registro_estatisticas` com
+5 aprovados e 5 falhas esperadas; segundo RED de lib e integração com 2 e 8 falhas,
+respectivamente. A tentativa inicial com erro de compilação não foi contada como
+RED. GREEN de `cargo test --lib --test registro_estatisticas`: 2 testes unitários
+e 13 de integração aprovados, zero falhas/ignorados. Suíte `cargo test`: 101/0/0.
+Formatação restrita aos arquivos próprios e `git diff --check` aprovados.
+Revisão independente da saída em conformidade e qualidade aprovada sem achados.
+
+Evidência do autor do núcleo: RED compilável dos dez testes novos de logs,
+todos falhando pelo contrato ausente; teste de estado inicial Executando falhou
+separadamente pelo comportamento ausente. GREEN de `cargo test --test simulador
+--test logs_simulacao --test laco --test transicoes`: 57 aprovados, zero falhas e
+zero ignorados. Após formatar apenas os arquivos próprios, `cargo test` teve
+111 aprovados, zero falhas e zero ignorados; rustfmt restrito em modo check e
+`git diff --check` aprovados. Os testes calculados à mão verificam eventos,
+retomada, médias fracionárias, carga, prioridades zero, ociosidade, validação
+anterior à saída, erros da CPU sem resumo e escrita em `/dev/full` no Linux.
+A falha de escrita testada ocorre na primeira carga, sem injeção artificial de
+falha tardia.
+
+Revisão independente do núcleo em conformidade e qualidade aprovada sem achados
+críticos, importantes ou menores.
+
+Verificações executadas pelo coordenador após cessarem as edições:
+`cargo check --all-targets`, `cargo test`, `cargo fmt --check`,
+`cargo clippy --all-targets -- -D warnings` e `git diff --check` aprovados.
+Suíte: 111 aprovados, zero falhas e zero ignorados; 2 testes de lib e 109 de
+integração, com zero testes unitários de main e zero doctests. As conferências
+byte a byte contra `eddae3c` preservam 25 arquivos: as 12 entradas oficiais,
+`ep1.pdf` e os 12 documentos do acervo. O boilerplate local existe e não foi
+alterado nesta entrega; não foi registrada comparação de hash desse arquivo.
+
+A execução de `cargo run --quiet --bin Escalonador` retornou código 1, stdout
+vazio e stderr `Não implementado: integração da simulação com estatísticas e logs`.
+Havia zero logs antes e zero depois. `main` e seus testes permanecem intactos;
+o diagnóstico antigo continua indicando a integração principal pendente.
+Não há resultados experimentais nem relatório produzido.
+
+Revisão documental e final do conjunto aprovada em conformidade e qualidade,
+sem achados críticos, importantes ou menores.
+
+Após colocar os 11 arquivos da quinta etapa em stage, o usuário autorizou commit
+na branch `codex/etapa5-logs-estatisticas` e merge local na `main`, exigindo última
+revisão antes dessas operações. HEAD e `main` permanecem em `eddae3c` nesta
+conferência. A autorização substitui a condição anterior de trabalho sem stage,
+commit ou merge; não autoriza push nem a integração da execução principal.
+Última revisão pré-commit aprovada em conformidade e qualidade, sem achados
+críticos, importantes ou menores. Nova verificação executada pelo coordenador:
+`cargo check --all-targets`, `cargo test` (111 aprovados, zero falhas e zero
+ignorados), `cargo fmt --check` e `cargo clippy --all-targets -- -D warnings`
+aprovados. Os 25 arquivos protegidos permanecem intactos contra `eddae3c`.
+Execução principal com código 1, stdout vazio, diagnóstico exato preservado e
+zero logs antes/depois. Commit e merge local ainda pendentes; não há hash
+antecipado nem publicação afirmada.
 
 ## Como manter
 
