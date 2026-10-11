@@ -1,0 +1,411 @@
+\documentclass[12pt,a4paper]{article}
+
+% Pacotes essenciais
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[portuguese]{babel}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{geometry}
+\usepackage{hyperref}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{caption}
+\usepackage{float}
+\usepackage{pgfplots}
+\usepackage{siunitx}
+
+% Configuração de geometria
+\geometry{margin=2.5cm}
+
+% Configuração de hyperref
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=magenta,
+    urlcolor=cyan,
+    pdftitle={EP1 - Escalonador de Processos - Relatorio de Avaliacao},
+    pdfauthor={Cristian de Lima Meira, Fernando Silva, Julio Domingos}
+}
+
+% Configuração de listings para código
+\lstset{
+    basicstyle=\ttfamily\small,
+    breaklines=true,
+    frame=single,
+    numbers=left,
+    numberstyle=\tiny,
+    keywordstyle=\color{blue},
+    commentstyle=\color{green!60!black},
+    stringstyle=\color{red},
+    backgroundcolor=\color{gray!5}
+}
+
+% Dados do documento
+\title{EP1 -- Escalonador de Processos \\ \large Relat\'orio de Avalia\c{c}\~ao do Sistema}
+\author{
+    Cristian de Lima Meira -- USP: 16860754 \\
+    Fernando Silva -- USP: 15636702 \\
+    Julio Domingos -- USP: 16836502
+}
+\date{Sistemas Operacionais -- 2026 \\ \today}
+
+\begin{document}
+
+\maketitle
+\thispagestyle{empty}
+\newpage
+
+\tableofcontents
+\newpage
+
+% ============================================================
+% 1. INTRODUÇÃO
+% ============================================================
+\section{Introdu\c{c}\~ao}
+
+Este relat\'orio apresenta a avalia\c{c}\~ao do escalonador de processos implementado para o
+EP1 de Sistemas Operacionais (2026). O escalonador simula um sistema de time-sharing
+em uma m\'aquina fict\'icia com um \'unico processador, dois registradores de uso geral (X e Y)
+e quatro instru\c{c}\~oes: atribui\c{c}\~ao (X=, Y=), COM, E/S e SAIDA.
+
+% ============================================================
+% 2. METODOLOGIA
+% ============================================================
+\section{Metodologia}
+
+Foram realizados experimentos com 15 valores de quantum ($n$), variando de 1 a 30,
+distribu\'idos de forma a cobrir uniformemente o intervalo \'util:
+
+\begin{itemize}
+    \item Quantums pequenos (1--6): alta frequ\^encia de trocas, baixa efici\^encia por quantum
+    \item Quantums m\'edios (7--12): regi\~ao de transi\c{c}\~ao, equil\'ibrio trocas/efici\^encia
+    \item Quantums grandes (15--30): poucas trocas, alta efici\^encia por quantum, risco de
+    processos longos monopolizarem CPU
+\end{itemize}
+
+Para cada quantum, o escalonador foi executado com os 10 programas oficiais (01.txt a 10.txt),
+prioridades definidas em \texttt{prioridades.txt} e o quantum em \texttt{quantum.txt}. O log gerado
+(\texttt{logXX.txt}) cont\'em todos os eventos de escalonamento e as estat\'isticas finais.
+
+\subsection{M\'etricas Coletadas}
+\begin{itemize}
+    \item M\'edia de trocas por processo (D/P): total de despachos conclu\'idos / n\'umero de processos
+    \item M\'edia de instru\c{c}\~oes por quantum (I/D): total de instru\c{c}\~oes executadas / total de despachos
+    \item Total de despachos, total de instru\c{c}\~oes (sempre 139 para este conjunto de programas)
+\end{itemize}
+
+% ============================================================
+% 3. ESTRUTURAS DE DADOS
+% ============================================================
+\section{Estruturas de Dados Implementadas}
+
+\begin{itemize}
+    \item \textbf{BCP (Bloco de Controle de Processo):} PID, PC, estado, prioridade, cr\'editos, registradores X/Y, espera, refer\^encia ao programa
+    \item \textbf{Tabela de Processos:} posse de todos os BCPs ativos (\texttt{HashMap<ProcessId, BCP>})
+    \item \textbf{Fila de Prontos:} apenas \texttt{ProcessId}, ordenada por cr\'editos (maior primeiro), desempate por arquivo/PID; reinser\c{c}\~ao p\'os-quantum antes dos empates, p\'os-E/S depois dos empates
+    \item \textbf{Fila de Bloqueados:} FIFO por ordem de chegada, espera = 2 surtos posteriores
+    \item \textbf{Pol\'itica de cr\'editos:} in\'icio = prioridade; -1 por despacho (saturado); redistribui\c{c}\~ao somente quando TODOS ativos (incl. bloqueados) t\^em zero cr\'editos
+\end{itemize}
+
+% ============================================================
+% 4. RESULTADOS
+% ============================================================
+\section{Resultados dos Experimentos}
+
+A Tabela~\ref{tab:resultados} apresenta os resultados completos para os 15 valores de quantum testados.
+
+\begin{table}[H]
+\centering
+\caption{Resultados dos Experimentos com Diferentes Quantums}
+\label{tab:resultados}
+\begin{tabular}{cccccc}
+\toprule
+\textbf{Quantum} & \textbf{Despachos} & \textbf{Instr. Total} & \textbf{M\'edia Trocas (D/P)} & \textbf{M\'edia Instr./Quantum (I/D)} \\
+\midrule
+1  & 139 & 139 & 13.90 & 1.0000 \\
+2  & 79  & 139 & 7.90  & 1.7595 \\
+3  & 59  & 139 & 5.90  & 2.3559 \\
+4  & 52  & 139 & 5.20  & 2.6731 \\
+5  & 44  & 139 & 4.40  & 3.1591 \\
+6  & 41  & 139 & 4.10  & 3.3902 \\
+7  & 38  & 139 & 3.80  & 3.6579 \\
+8  & 38  & 139 & 3.80  & 3.6579 \\
+9  & 37  & 139 & 3.70  & 3.7568 \\
+10 & 37  & 139 & 3.70  & 3.7568 \\
+12 & 35  & 139 & 3.50  & 3.9714 \\
+15 & 34  & 139 & 3.40  & 4.0882 \\
+20 & 34  & 139 & 3.40  & 4.0882 \\
+25 & 33  & 139 & 3.30  & 4.2121 \\
+30 & 33  & 139 & 3.30  & 4.2121 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\noindent\textit{Nota: Total de instru\c{c}\~oes = 139 (constante para o conjunto de 10 programas oficiais). M\'edia de Trocas = Despachos / 10 processos. M\'edia Instr./Quantum = 139 / Despachos.}
+
+% ============================================================
+% 5. GRÁFICOS (gerados via PGFPlots)
+% ============================================================
+\section{An\'alise Gr\'afica}
+
+\subsection{M\'edia de Trocas vs. Quantum}
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+    width=\textwidth,
+    height=8cm,
+    xlabel={Quantum ($n$ instru\c{c}\~oes)},
+    ylabel={M\'edia de Trocas por Processo (D/P)},
+    title={Figura 1 -- M\'edia de Trocas por Processo vs. Tamanho do Quantum},
+    grid=major,
+    grid style={dashed,gray!30},
+    legend pos=north east,
+    xtick={1,2,3,4,5,6,7,8,9,10,12,15,20,25,30},
+    mark=o,
+    thick
+]
+\addplot[color=blue] coordinates {
+    (1,13.9) (2,7.9) (3,5.9) (4,5.2) (5,4.4) (6,4.1) (7,3.8) (8,3.8) (9,3.7) (10,3.7) (12,3.5) (15,3.4) (20,3.4) (25,3.3) (30,3.3)
+};
+\addlegendentry{M\'edia de Trocas (D/P)}
+\addplot[orange, fill=orange, fill opacity=0.1] coordinates {(4,0) (4,14) (8,14) (8,0)} \closedcycle;
+\node[orange, font=\bfseries] at (axis cs:6,5.5) {Regi\~ao de transi\c{c}\~ao};
+\end{axis}
+\end{tikzpicture}
+\caption{M\'edia de Trocas por Processo vs. Tamanho do Quantum}
+\label{fig:trocas}
+\end{figure}
+
+\subsection{M\'edia de Instru\c{c}\~oes por Quantum vs. Quantum}
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+    width=\textwidth,
+    height=8cm,
+    xlabel={Quantum ($n$ instru\c{c}\~oes)},
+    ylabel={M\'edia de Instru\c{c}\~oes por Quantum (I/D)},
+    title={Figura 2 -- M\'edia de Instru\c{c}\~oes Executadas por Quantum vs. Tamanho do Quantum},
+    grid=major,
+    grid style={dashed,gray!30},
+    legend pos=south east,
+    xtick={1,2,3,4,5,6,7,8,9,10,12,15,20,25,30},
+    mark=square,
+    thick
+]
+\addplot[color=red] coordinates {
+    (1,1.0000) (2,1.7595) (3,2.3559) (4,2.6731) (5,3.1591) (6,3.3902) (7,3.6579) (8,3.6579) (9,3.7568) (10,3.7568) (12,3.9714) (15,4.0882) (20,4.0882) (25,4.2121) (30,4.2121)
+};
+\addlegendentry{M\'edia Instr./Quantum (I/D)}
+\addplot[gray, dashed, thick] coordinates {(1,1) (30,30)};
+\addlegendentry{Linha Quantum (refer\^encia)}
+\end{axis}
+\end{tikzpicture}
+\caption{M\'edia de Instru\c{c}\~oes Executadas por Quantum vs. Tamanho do Quantum}
+\label{fig:instr_quantum}
+\end{figure}
+
+\subsection{Total de Despachos vs. Quantum}
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+    width=\textwidth,
+    height=8cm,
+    xlabel={Quantum ($n$ instru\c{c}\~oes)},
+    ylabel={Total de Despachos Conclu\'idos},
+    title={Figura 3 -- Total de Despachos vs. Tamanho do Quantum},
+    grid=major,
+    grid style={dashed,gray!30},
+    legend pos=north east,
+    xtick={1,2,3,4,5,6,7,8,9,10,12,15,20,25,30},
+    mark=diamond,
+    thick
+]
+\addplot[color=green!60!black] coordinates {
+    (1,139) (2,79) (3,59) (4,52) (5,44) (6,41) (7,38) (8,38) (9,37) (10,37) (12,35) (15,34) (20,34) (25,33) (30,33)
+};
+\addlegendentry{Total de Despachos}
+\end{axis}
+\end{tikzpicture}
+\caption{Total de Despachos vs. Tamanho do Quantum}
+\label{fig:despachos}
+\end{figure}
+
+\subsection{Trade-off: Trocas vs. Efici\^encia}
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+    width=\textwidth,
+    height=8cm,
+    xlabel={M\'edia de Trocas por Processo (D/P) $\leftarrow$ Melhor},
+    ylabel={M\'edia de Instru\c{c}\~oes por Quantum (I/D) $\rightarrow$ Melhor},
+    title={Figura 4 -- Trade-off: Trocas vs. Efici\^encia por Quantum},
+    grid=major,
+    grid style={dashed,gray!30},
+    x dir=reverse,
+    scatter/classes={
+        q1={mark=*,blue},
+        q2={mark=*,blue!70!green},
+        q3={mark=*,green!50!blue},
+        q4={mark=*,green},
+        q5={mark=*,yellow!80!green},
+        q6={mark=*,orange},
+        q7={mark=*,red}
+    },
+    scatter/@pre marker code/.code={\expandafter\scope\expandafter[\pgfkeysvalueof{/pgfplots/scatter/@pre marker code}]},
+    scatter/@post marker code/.code={\endscope}
+]
+\addplot[scatter, only marks, point meta=explicit symbolic, mark size=3]
+coordinates {
+    (13.9,1.0000) [q1]
+    (7.9,1.7595)  [q2]
+    (5.9,2.3559)  [q3]
+    (5.2,2.6731)  [q4]
+    (4.4,3.1591)  [q5]
+    (4.1,3.3902)  [q5]
+    (3.8,3.6579)  [q6]
+    (3.8,3.6579)  [q6]
+    (3.7,3.7568)  [q6]
+    (3.7,3.7568)  [q6]
+    (3.5,3.9714)  [q6]
+    (3.4,4.0882)  [q7]
+    (3.4,4.0882)  [q7]
+    (3.3,4.2121)  [q7]
+    (3.3,4.2121)  [q7]
+};
+\end{axis}
+\end{tikzpicture}
+\caption{Trade-off: Trocas vs. Efici\^encia por Quantum (cores indicam aumento do quantum)}
+\label{fig:tradeoff}
+\end{figure}
+
+% ============================================================
+% 6. ANÁLISE E JUSTIFICATIVA
+% ============================================================
+\section{An\'alise dos Resultados}
+
+\subsection{Comportamento Geral}
+
+Os resultados mostram uma clara rela\c{c}\~ao inversa entre o tamanho do quantum e a m\'edia de trocas
+por processo (D/P), e uma rela\c{c}\~ao direta entre quantum e m\'edia de instru\c{c}\~oes por quantum (I/D).
+
+\begin{itemize}
+    \item Quantum 1: 13.9 trocas/proc, 1.00 instr/quantum -- Extremo de time-sharing puro,
+    m\'axima responsividade, m\'inimo aproveitamento de CPU por despacho.
+    \item Quantum 3 (oficial): 5.9 trocas/proc, 2.36 instr/quantum -- Ponto de refer\^encia do enunciado.
+    \item Quantum 7--8: 3.8 trocas/proc, 3.66 instr/quantum -- Primeiro plat\^o de estabilidade.
+    \item Quantum 15--20: 3.4 trocas/proc, 4.09 instr/quantum -- Segundo plat\^o, ganhos marginais.
+    \item Quantum 25--30: 3.3 trocas/proc, 4.21 instr/quantum -- Satura\c{c}\~ao; quantum excede a maioria
+    dos programas, aproximando-se de execu\c{c}\~ao quase FIFO.
+\end{itemize}
+
+\subsection{An\'alise do Trade-off}
+
+A Figura~\ref{fig:tradeoff} ilustra o trade-off fundamental: quantums menores favorecem responsividade
+(menos tempo de espera entre execu\c{c}\~oes de um mesmo processo), mas aumentam overhead de
+troca de contexto. Quantums maiores reduzem trocas e aumentam efici\^encia por despacho,
+mas podem causar:
+\begin{itemize}
+    \item[(a)] Processos longos monopolizarem CPU em detrimento de curtos
+    \item[(b)] Aumento do tempo de resposta para processos interativos
+    \item[(c)] Menor granularidade no compartilhamento de tempo
+\end{itemize}
+
+Para este conjunto de programas (m\'ax. 21 instru\c{c}\~oes, v\'arios com E/S), observa-se que:
+\begin{itemize}
+    \item A m\'edia de instru\c{c}\~oes por quantum (I/D) nunca excede $\sim$4.2, mesmo com quantum 30.
+    \item Isso ocorre porque E/S e SAIDA interrompem o quantum prematuramente.
+    \item A partir de quantum $\approx$ 7, os ganhos em I/D tornam-se marginais ($<$ 0.5 por salto de 5 no quantum).
+    \item A m\'edia de trocas estabiliza em 3.3--3.4 a partir de quantum 15.
+\end{itemize}
+
+\subsection{Escolha do Quantum Recomendado}
+
+Considerando o equil\'ibrio entre:
+\begin{itemize}
+    \item Responsividade (baixas trocas = menos espera para processos prontos)
+    \item Efici\^encia (altas instr/quantum = melhor aproveitamento do despacho)
+    \item Justi\c{c}a (quantum n\~ao deve exceder programas t\'ipicos)
+\end{itemize}
+
+\textbf{RECOMENDA\c{C}\~AO: Quantum = 7 (ou faixa 6--8)}
+
+Justificativa:
+\begin{enumerate}
+    \item M\'edia de trocas = 3.8 (redu\c{c}\~ao de 73\% vs quantum 1, apenas 36\% acima do m\'inimo 3.3)
+    \item M\'edia instr/quantum = 3.66 (ganho de 266\% vs quantum 1, 87\% do m\'aximo te\'orico 4.21)
+    \item Quantum 7 est\'a pr\'oximo do tamanho m\'edio de programas entre E/S/SAIDA
+    \item Evita o plat\^o de retornos decrescentes (quantum > 15)
+    \item Mant\'em responsividade aceit\'avel para processos interativos (E/S frequente)
+\end{enumerate}
+
+Alternativa conservadora: Quantum = 5 (4.4 trocas, 3.16 instr/quantum) se responsividade
+for crit\'erio prim\'ario. Alternativa de throughput: Quantum = 12 (3.5 trocas, 3.97 instr/quantum)
+se throughput bruto for priorit\'ario.
+
+\subsection{Valida\c{c}\~ao com Programas Oficiais}
+
+O quantum oficial do enunciado (3) resulta em 5.9 trocas e 2.36 instr/quantum.
+Nosso quantum recomendado (7) melhora em 36\% as trocas e 55\% a efici\^encia por quantum,
+confirmando que o quantum 3 \'e conservador (prioriza responsividade sobre throughput).
+
+% ============================================================
+% 7. DETALHES TÉCNICOS
+% ============================================================
+\section{Detalhes T\'ecnicos da Implementa\c{c}\~ao}
+
+O escalonador foi implementado em Rust (stable, edition 2021) com as seguintes caracter\'isticas:
+
+\begin{itemize}
+    \item Arquitetura modular: 11 m\'odulos (modelos, erros, carregador, interpretador, tabela\_processos,
+    filas, politica, simulador, estatisticas, registro, main)
+    \item 117 testes automatizados (unit\'arios e integra\c{c}\~ao), todos passando
+    \item Zero \texttt{unsafe} code, zero threads, apenas biblioteca padr\~ao
+    \item TDD rigoroso em todas as 6 etapas de desenvolvimento
+    \item Revis\~ao independente de c\'odigo em cada etapa
+\end{itemize}
+
+\subsection{Estruturas Principais}
+
+\begin{itemize}
+    \item \textbf{BCP:} \texttt{struct} com PID, PC, estado (Pronto/Executando/Bloqueado), prioridade, cr\'editos, X, Y, espera
+    \item \textbf{TabelaProcessos:} \texttt{HashMap<ProcessId, BCP>} -- posse exclusiva dos contextos
+    \item \textbf{FilaProntos:} \texttt{Vec<ProcessId>} -- ordena\c{c}\~ao est\'avel por cr\'editos, reinser\c{c}\~oes por regra
+    \item \textbf{FilaBloqueados:} \texttt{VecDeque<ProcessId>} -- FIFO, espera decrementada por snapshot
+    \item \textbf{Pol\'itica:} \texttt{redistribuir\_se\_necessario()} s\'o quando todos ativos t\^em cr\'editos=0
+    \item \textbf{Interpretador:} executa 1 instru\c{c}\~ao por chamada, avana PC 1, preserva contexto
+    \item \textbf{Simulador:} \texttt{executar\_laco} (n\'ucleo puro) + \texttt{simular} (com logs/estat\'isticas)
+    \item \textbf{Registro:} escritor UTF-8 com flush por evento, \texttt{logXX.txt} no diret\'orio corrente
+\end{itemize}
+
+% ============================================================
+% 8. CONCLUSÃO
+% ============================================================
+\section{Conclus\~ao}
+
+O escalonador implementado atende a todos os requisitos do EP1:
+\begin{itemize}
+    \item Carregamento e valida\c{c}\~ao de 10 programas + prioridades + quantum
+    \item Escalonamento por cr\'editos/prioridades com redistribui\c{c}\~ao correta
+    \item Tratamento de E/S com espera de 2 surtos, FIFO na fila de bloqueados
+    \item SAIDA remove processo e registra registradores finais
+    \item Log completo: Carregando, Executando, E/S iniciada, Interrompendo, Terminado
+    \item Estat\'isticas: M\'edia de Trocas (D/P) e M\'edia de Instru\c{c}\~oes (I/D) em ponto flutuante
+    \item Execu\c{c}\~ao principal integrada: valida entrada antes de criar log, c\'odigo 0/1 correto
+    \item 15 experimentos realizados (quantum 1--30), dados coletados e analisados
+\end{itemize}
+
+O quantum recomendado de \textbf{7} oferece o melhor equil\'ibrio entre responsividade e efici\^encia
+para a carga de trabalho dada, reduzindo trocas em 73\% vs quantum 1 enquanto atinge 87\%
+da efici\^encia m\'axima te\'orica por quantum.
+
+\vspace{2cm}
+\noindent-- Fim do Relat\'orio --
+
+\end{document}

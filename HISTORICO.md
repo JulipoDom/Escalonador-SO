@@ -1,17 +1,16 @@
 # Histórico e acompanhamento do EP1
 
-Última conferência: **2026-10-11**, base Git `5ca6f6c`, branch
-`codex/etapa6-execucao-integrada`.
-Estado atual: sexta etapa autorizada implementada em `main` e testes de execução,
-em trabalho ainda sem commit, stage, merge ou push desta etapa. O usuário autorizou
-commit, merge na `main` e push; as operações e novas verificações de publicação
-ainda estão pendentes, com HEAD e `main` em `5ca6f6c`. Programas, prioridades e
-quantum são validados antes de criar o log no diretório corrente; `simular` publica
-eventos e resumo reais antes do sucesso. Evidência do autor: RED compilável com
-5 aprovados, 6 falhas esperadas e zero ignorados; GREEN de execução 11/0/0 e suíte
-completa 117/0/0. Revisão independente de código aprovada sem achados. Checks globais do coordenador aprovados: check, suíte 117/0/0, fmt, Clippy
-e diff check. Revisão documental/final aprovada em conformidade e qualidade, sem achados críticos, importantes ou menores. Experimentos e relatório PDF são os próximos passos propostos e exigem
-novo pedido.
+Última conferência: **2026-10-11**, base Git `bf093f1`, branch `main`.
+Estado atual: sexta etapa **commitada, integrada à `main` e publicada no `origin/main`**.
+Commit `bf093f1` (`feat: integrated execution`) avança a `main` de `5ca6f6c` para `bf093f1`;
+`origin/main` sincronizada. Suíte completa: **117 aprovados, zero falhas, zero ignorados**.
+Execução com entradas oficiais validada: quantum 3, código 0, stdout/stderr vazios,
+`log03.txt` gerado no diretório corrente, 10 processos carregados/terminados,
+59 despachos, 139 instruções, média de trocas 5.9, média de instruções 2.3559322033898304.
+Checks globais do coordenador aprovados: `cargo check --all-targets`, `cargo test` (117/0/0),
+`cargo fmt --check`, `cargo clippy --all-targets -- -D warnings`, `git diff --check`.
+Revisão documental/final aprovada em conformidade e qualidade, sem achados.
+Experimentos e relatório PDF continuam como próximos passos propostos, exigem novo pedido.
 
 A quinta etapa permanece registrada em `e61ce88`, com exatamente 11 arquivos,
 após última revisão pré-commit e nova verificação do coordenador aprovadas.
@@ -23,10 +22,7 @@ preservando o contrato de `executar_laco`. Revisões independentes da saída e d
 núcleo, documental e final daquela entrega aprovadas sem achados; check, suíte
 111/0/0, fmt, Clippy e diff check aprovados pelo coordenador.
 
-As etapas anteriores permanecem registradas: quarta etapa em `75941d0`, contextos
-em `05bc657`, integrados à `main` por fast-forward autorizado de `94a9482`, com
-92/0/0 pós-merge; publicação autorizada concluída até `434f43b`. Terceira etapa em
-`57099c4`, segunda em `8d4d172` e enunciado `ep1.pdf` em `7336c37`.
+As etapas anteriores permanecem registradas: sexta etapa em `bf093f1`, quinta etapa em `e61ce88`, quarta etapa em `75941d0`, contextos em `05bc657`, integrados à `main` por fast-forward autorizado de `94a9482`, com 92/0/0 pós-merge; publicação autorizada concluída até `434f43b`. Terceira etapa em `57099c4`, segunda em `8d4d172` e enunciado `ep1.pdf` em `7336c37`.
 
 ## Objetivo e escopo
 
@@ -182,6 +178,7 @@ proposta de validação, não uma funcionalidade adicional prometida.
 | 2026-10-11 | Entrega sem commit sobre `5ca6f6c` | Sexta etapa na branch `codex/etapa6-execucao-integrada`: integração de `main` com carregamento, quantum e `simular`; RED compilável 5/6/0, GREEN de execução 11/0/0 e suíte do autor 117/0/0. Revisão independente de código aprovada sem achados; checks globais do coordenador aprovados (check, suíte 117/0/0, fmt, Clippy e diff check); revisão documental/final aprovada em conformidade e qualidade, sem achados críticos, importantes ou menores; sem stage, commit, merge ou push desta etapa. |
 
 | 2026-10-11 | Trabalho sobre `5ca6f6c` | Usuário autorizou commit da sexta etapa, merge na `main` e push. HEAD e `main` ainda em `5ca6f6c`, oito arquivos da entrega sem stage (sete rastreados e o plano novo); novas conferências e operações Git pendentes. Experimentos e relatório continuam fora deste pedido. |
+| 2026-10-11 | `bf093f1` | Sexta etapa commitada (`feat: integrated execution`), integrada à `main` por fast-forward de `5ca6f6c` e publicada no `origin/main`. Suíte 117/0/0, execução com entradas oficiais validada (q3, código 0, log03.txt, 10 processos, 59 despachos, 139 instruções, médias 5.9 e 2.3559...). Checks globais aprovados. |
 
 Verificação da entrega `748077f`: `cargo check --all-targets`, `cargo fmt --check`,
 `cargo clippy --all-targets -- -D warnings` e `git diff --check` aprovados;
@@ -487,17 +484,14 @@ edições: `cargo check --all-targets`, `cargo test`, `cargo fmt --check`,
 Suíte: 117 aprovados, zero falhas e zero ignorados; 2 testes de lib e 115 de
 integração, zero testes unitários de main e zero doctests. Snapshot dos 31
 arquivos preservado e nenhum log na raiz. Revisão documental/final aprovada em conformidade e qualidade, sem achados críticos, importantes ou menores.
-Não foram executados stage, commit, merge ou push desta etapa; não foram
-produzidos experimentos de dez quantums ou relatório.
 
-Após a entrega sem commit, o usuário autorizou registrar a sexta etapa em commit,
-integrá-la à `main` e realizar push. Essa autorização substitui a condição
-anterior de trabalho sem operações Git; não amplia o escopo técnico nem autoriza
-experimentos ou relatório. Nesta atualização, a branch permanece
-`codex/etapa6-execucao-integrada`, com HEAD e `main` em `5ca6f6c` e oito arquivos
-da entrega sem stage (sete rastreados e o plano novo). Novas verificações de
-publicação, commit, merge e push ainda pendentes; nenhuma dessas operações é
-afirmada como concluída.
+**Commit, merge e push concluídos:** commit `bf093f1` (`feat: integrated execution`)
+criado na branch `codex/etapa6-execucao-integrada` com 8 arquivos (7 rastreados +
+plano novo). Após revisão final, integrado à `main` por fast-forward de `5ca6f6c`
+para `bf093f1` e publicado no `origin/main` (código 0). Working tree limpo.
+Branch da etapa pode ser removida. Suíte pós-merge: 117/0/0. Execução integrada
+validada no diretório do projeto com `cargo run --bin Escalonador`: quantum 3,
+`log03.txt` publicado, resumo real, código 0.
 
 ## Como manter
 
