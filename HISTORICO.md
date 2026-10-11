@@ -1,13 +1,14 @@
 # Histórico e acompanhamento do EP1
 
-Última conferência: **2026-10-11**, base Git `7336c37` na `main` e em `origin/main`.
-Estado atual: segunda etapa de filas, política de créditos e operações de espera
-de E/S registrada no commit `8d4d172` e integrada localmente à `main` por
-fast-forward em 2026-10-11. O enunciado `ep1.pdf` foi incluído como contexto do
-projeto no commit `7336c37`, e os commits locais foram enviados para `origin/main`
-com autorização do usuário. Verificações e revisão independente
-pré-commit aprovadas; suíte pós-merge com 59 aprovados, zero falhas e zero
-ignorados. Integração ao laço de simulação continua pendente.
+Última conferência: **2026-10-11**, base Git `7ced42f`, branch
+`codex/etapa3-transicoes-es`. Estado atual: terceira etapa de despacho, transições
+e E/S em um passo integrado implementada e verificada, colocada em stage pelo
+usuário; revisão pré-commit e commit autorizados se o conjunto estiver correto.
+Essa conferência foi aprovada sem achados; push e merge não foram solicitados. Revisão independente do núcleo em conformidade e qualidade
+aprovada sem achados; revisões documental e final do conjunto aprovadas sem achados.
+A segunda etapa foi registrada em `8d4d172`, integrada e publicada na `main`;
+o enunciado `ep1.pdf` foi incluído como contexto em `7336c37`. O laço completo,
+estatísticas, logs reais e integração de `main` continuam pendentes.
 
 ## Objetivo e escopo
 
@@ -15,7 +16,8 @@ Implementar o escalonador do EP1 de Sistemas Operacionais de **2026**, conforme
 [enunciado na raiz](ep1.pdf), em Rust stable, edição 2021, Cargo e somente a biblioteca padrão.
 A base atual preserva os 12 arquivos oficiais em `programas/`. A primeira etapa
 autorizada executa instruções e quantum; a segunda implementa filas, política de
-créditos e operações de espera de E/S. A integração ao laço, o restante do núcleo,
+créditos e operações de espera de E/S; a terceira integra despacho, transições e
+ociosidade em um passo. O laço completo, o restante do núcleo,
 experimentos e relatório PDF continuam pendentes.
 
 ## Estado atual por módulo
@@ -25,9 +27,9 @@ experimentos e relatório PDF continuam pendentes.
 | `modelos`, `erros` | Instruções, BCP, IDs, estados, resultados e erros | Ajustes somente se exigidos pelo núcleo |
 | `carregador` | Leitura e validação de programas, prioridades e quantum | Integração com a simulação |
 | `tabela_processos` | Posse dos BCPs, inserção sem sobrescrever PID, consulta e remoção | Uso pelo laço de simulação |
-| `filas`, `politica` | Carga, seleção, reordenação, reinserções, bloqueio, avanço de esperas, desconto e redistribuição de créditos | Integração com transições e laço de simulação |
+| `filas`, `politica` | Carga, seleção, reordenação, reinserções, bloqueio, avanço de esperas, desconto e redistribuição de créditos, consumidos pelo passo integrado | Uso pelo laço completo |
 | `interpretador` | Atribuições, COM, E/S, SAIDA, validação e avanço único do PC | Integração com o laço de simulação |
-| `simulador` | Quantum limitado, contagem, paradas e propagação de erros | Laço de simulação, despacho, transições e tempo lógico |
+| `simulador` | Quantum limitado e passo integrado: despacho, transições, E/S, tick ocioso, conclusão vazia e BCP terminado por valor | Laço completo de simulação |
 | `estatisticas` | Contratos de coleta e médias | Contadores e cálculo D/P e I/D |
 | `registro` | Escrita de eventos e resumo fornecido, com erros de escrita propagados | Eventos e valores reais produzidos pelo núcleo |
 | `main` | Recusa argumentos, valida `programas/` no diretório corrente | Integrar simulação, log e resumo reais |
@@ -49,20 +51,28 @@ verificam a recusa; não demonstram que a simulação funciona.
 - Créditos começam na prioridade, caem uma vez por despacho sem ficar negativos
   e só são redistribuídos quando todos os ativos, inclusive bloqueados, têm zero.
 - Desempates, reinserções e exceções FIFO seguem as convenções do README e do EP.
-  Seleção não altera estado: o laço futuro define Executando e recoloca Pronto antes
-  de reinserir. Filas validam existência, estado e duplicidade antes de modificar.
+  Seleção não altera estado: o passo integrado define Executando e recoloca Pronto
+  antes de reinserir. Filas validam existência, estado e duplicidade antes de modificar.
 - E/S espera dois surtos posteriores; o surto que bloqueia não reduz a própria espera.
   As operações implementadas validam o snapshot anterior integralmente, descontam
-  somente seus IDs e liberam elegíveis na ordem FIFO da fila. O laço futuro deve
-  aplicar isso ao fim dos surtos; em ociosidade, avançar somente a espera lógica,
-  sem instruções, créditos ou despachos.
+  somente seus IDs e liberam elegíveis na ordem FIFO da fila. O passo integrado
+  aplica isso ao fim dos surtos; em ociosidade, avança uma unidade lógica,
+  sem instruções, alteração de créditos ou despachos.
+- `ResultadoPasso` distingue Surto com resultado real e BCP terminado opcional,
+  Ocioso com IDs liberados e Concluido para estado vazio válido. SAIDA remove o
+  BCP e devolve seu nome, programa, PC, registradores e crédito final por valor.
+- Quantum zero e inconsistências estruturais são recusados sem mutação. Erro de
+  CPU após despacho preserva Executando fora das filas, crédito descontado e
+  progresso válido; não avança esperas nem aplica transição. Sem recuperação
+  automática, a chamada seguinte rejeita esse estado antes de mutar.
 - Manter o escopo essencial: sem CLI configurável, lote automático, CSV, threads,
   tempo real, `unsafe`, resultados experimentais inventados ou relatório fictício.
 - Usar o fluxo Superpowers detalhado no AGENTS. Plano e registros recuperados
   de `58835cb` são históricos; o plano `docs/superpowers/plans/2026-10-10-contexto-atual.md`
   orienta as próximas entregas. O [plano da primeira etapa](docs/superpowers/plans/2026-10-10-etapa1-interpretador-quantum.md)
   registra o recorte CPU; o [plano da segunda etapa](docs/superpowers/plans/2026-10-10-etapa2-filas-politica.md)
-  registra filas, política e esperas. As etapas restantes exigem novo pedido.
+  registra filas, política e esperas; o [plano da terceira etapa](docs/superpowers/plans/2026-10-11-etapa3-transicoes-es.md)
+  registra o passo integrado. As etapas restantes exigem novo pedido.
 
 ## Sequência proposta de implementação e verificação
 
@@ -74,10 +84,12 @@ verificam a recusa; não demonstram que a simulação funciona.
   reinserções, desconto saturado, bloqueados com crédito, redistribuição, prioridades
   zero, snapshots, liberação FIFO e erros sem mutação aprovados; revisão independente
   de conformidade e qualidade sem achados.
-- [ ] Próximo passo proposto: integrar transições e E/S ao laço; testar dois surtos posteriores, surtos curtos,
-  surtos consecutivos do mesmo PID, liberações FIFO e ausência de IDs duplicados.
-- [ ] Integrar simulação; testar término com tabela vazia e ociosidade sem consumo
-  de instruções, créditos ou despachos.
+- [x] Integrar despacho, transições e E/S em um passo; testes de dois surtos
+  posteriores, surtos curtos, repetição do PID, liberações FIFO, estados inválidos,
+  aborto da CPU, término com contexto e tick ocioso aprovados; revisão independente
+  de conformidade e qualidade do núcleo sem achados.
+- [ ] Próximo passo proposto: implementar o laço completo consumindo os passos,
+  com testes pequenos calculados à mão de execução até a conclusão.
 - [ ] Coletar estatísticas e integrar logs; testar D/P e I/D em ponto flutuante,
   denominadores, E/S e SAIDA contadas, término e despachos repetidos do mesmo PID.
 - [ ] Executar manualmente ao menos dez quantums uniformemente distribuídos em
@@ -102,6 +114,8 @@ proposta de validação, não uma funcionalidade adicional prometida.
 | 2026-10-11 | `8d4d172` | Segunda etapa registrada após revisão e conferência do stage, integrada localmente à `main` por fast-forward autorizado, sem push; suíte pós-merge aprovada com 59/0/0. |
 | 2026-10-11 | Entrega sobre `888a1f8` | Inclusão do enunciado `ep1.pdf` de 2026 como contexto do projeto, preservado byte a byte, e publicação dos commits locais em `origin/main` autorizadas pelo usuário. |
 | 2026-10-11 | `7336c37` | Enunciado `ep1.pdf` incluído como contexto do projeto; publicação autorizada dos commits locais em `origin/main` concluída. |
+| 2026-10-11 | Entrega sem commit sobre `7ced42f` | Terceira etapa na branch `codex/etapa3-transicoes-es`: passo integrado de despacho, transições e E/S com TDD real, revisão independente do núcleo e 77/0/0; revisão final aprovada sem achados; laço completo pendente. |
+| 2026-10-11 | Trabalho sobre `7ced42f` | Usuário colocou a terceira etapa em stage e autorizou revisão pré-commit e commit se o conjunto estiver correto; conferência aprovada sem achados, sem pedido de push ou merge. |
 
 Verificação da entrega `748077f`: `cargo check --all-targets`, `cargo fmt --check`,
 `cargo clippy --all-targets -- -D warnings` e `git diff --check` aprovados;
@@ -193,6 +207,41 @@ Esse PDF é o enunciado existente; o relatório do trabalho continua pendente.
 O enunciado foi incluído no commit `7336c37` (`docs: add EP1 specification as
 project context`). O envio autorizado para `origin/main` retornou código 0 e
 avançou a `main` remota de `4210a1c` para `7336c37`.
+
+## Verificação da terceira etapa
+
+O autor do núcleo executou TDD em três grupos compiláveis: RED de 3, 6 e 9 falhas
+comportamentais por implementação ausente, seguidos de GREEN com 3, 9 e 18 testes
+no alvo `transicoes`, respectivamente. Os 18 testes calculados à mão cobrem
+validação anterior ao despacho, redistribuição, empates e FIFO, Quantum, E/S,
+SAIDA, surtos curtos e consecutivos do mesmo PID, snapshots, ociosidade, conclusão
+vazia e erros da CPU com progresso preservado. Revisão independente do núcleo
+em conformidade e qualidade aprovada sem achados. `executar_quantum` e o stub
+`simular` foram preservados; nenhum consumidor de logs ou estatísticas foi integrado.
+
+Verificações repetidas pelo coordenador após as edições documentais:
+`cargo check --all-targets`, `cargo test`, `cargo fmt --check`,
+`cargo clippy --all-targets -- -D warnings` e `git diff --check` aprovados.
+Testes: 77 aprovados, zero falhas e zero ignorados, incluindo os 18 novos testes
+de transições. Os contratos pendentes continuam comprovando recusa, não simulação
+completa. A execução encerrou com código 1, stdout vazio e erro explícito de laço
+pendente, sem logs. Os 12 arquivos oficiais, PDF, acervo e boilerplate local
+permanecem byte a byte como na base `7ced42f`; modelos, filas, política, execução,
+registro, estatísticas e Cargo permanecem intactos. Naquela entrega, não houve
+stage, commit, push ou merge; revisões documental e final do conjunto aprovadas
+em conformidade e qualidade, sem achados críticos, importantes ou menores.
+
+Após colocar a terceira etapa em stage, o usuário autorizou revisar o conjunto e
+criar o commit na branch atual se tudo estiver correto. Essa autorização substitui
+a condição anterior de trabalho sem stage ou commit; não amplia o escopo do
+núcleo. Verificações pré-commit deste turno executadas pelo coordenador: check de todos os
+alvos, testes (77 aprovados, zero falhas e zero ignorados), fmt e Clippy com
+warnings negados aprovados. Os 12 arquivos oficiais, PDF, acervo, boilerplate e
+módulos fora do escopo permanecem intactos; CPU e stub preservados. Execução com
+código 1, stdout vazio, erro explícito e sem logs. A revisão independente
+pré-commit de conformidade e qualidade foi aprovada sem achados críticos,
+importantes ou menores; oito arquivos em stage conferidos e
+`git diff --cached --check` aprovado. Push e merge não foram solicitados.
 
 ## Como manter
 
