@@ -311,15 +311,16 @@ fn erro_da_cpu_preserva_apenas_eventos_reais_sem_resumo_de_sucesso() {
     }
 }
 
-// Detecta erros de flush ignorados pela integração.
+// Detecta escrita no alvo de link em vez de substituição segura do destino.
 #[cfg(target_os = "linux")]
 #[test]
-fn escrita_em_dev_full_propaga_erro_de_io() {
+fn simulacao_substitui_link_para_dev_full_e_publica_log_regular() {
     let diretorio = DiretorioTemporario::novo();
     std::os::unix::fs::symlink("/dev/full", diretorio.0.join("log01.txt")).unwrap();
     let mut registro = RegistroLog::criar(&diretorio.0, 1).unwrap();
-    assert!(matches!(
-        simular(vec![processo(1, 1, &[Instrucao::Saida])], 1, &mut registro),
-        Err(ErroEp::Io(_))
-    ));
+    simular(vec![processo(1, 1, &[Instrucao::Saida])], 1, &mut registro).unwrap();
+    assert_eq!(std::fs::read_to_string(diretorio.0.join("log01.txt")).unwrap(), "Carregando P1\nExecutando P1\nP1 terminado. X=0. Y=0\nMEDIA DE TROCAS: 1\nMEDIA DE INSTRUCOES: 1\nQUANTUM: 1\n");
+    assert!(std::fs::symlink_metadata(diretorio.0.join("log01.txt"))
+        .unwrap()
+        .is_file());
 }

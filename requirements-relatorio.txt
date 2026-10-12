@@ -1,0 +1,3 @@
+# Somente a geração do PDF exige esta dependência.
+# A importação, a validação dos logs e os testes usam apenas std de Python.
+reportlab>=4.4,<5

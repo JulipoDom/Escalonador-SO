@@ -1,4 +1,6 @@
 /target/
+__pycache__/
+*.py[cod]
 *.tmp
 .superpowers/
 /BOILERPLATE_EP1_ESCALONADOR.md

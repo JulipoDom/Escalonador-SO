@@ -1,4 +1,4 @@
-//! Base do EP1; núcleo de escalonamento reservado.
+//! Escalonador do EP1 com núcleo, estatísticas e registro da simulação.
 #![forbid(unsafe_code)]
 pub mod carregador;
 pub mod erros;
