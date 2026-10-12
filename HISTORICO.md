@@ -1,28 +1,41 @@
 # Histórico e acompanhamento do EP1
 
-Última conferência: **2026-10-11**, base Git `bf093f1`, branch `main`.
-Estado atual: sexta etapa **commitada, integrada à `main` e publicada no `origin/main`**.
-Commit `bf093f1` (`feat: integrated execution`) avança a `main` de `5ca6f6c` para `bf093f1`;
-`origin/main` sincronizada. Suíte completa: **117 aprovados, zero falhas, zero ignorados**.
-Execução com entradas oficiais validada: quantum 3, código 0, stdout/stderr vazios,
-`log03.txt` gerado no diretório corrente, 10 processos carregados/terminados,
-59 despachos, 139 instruções, média de trocas 5.9, média de instruções 2.3559322033898304.
-Checks globais do coordenador aprovados: `cargo check --all-targets`, `cargo test` (117/0/0),
-`cargo fmt --check`, `cargo clippy --all-targets -- -D warnings`, `git diff --check`.
-Revisão documental/final aprovada em conformidade e qualidade, sem achados.
-Experimentos e relatório PDF continuam como próximos passos propostos, exigem novo pedido.
+Última conferência documental: **2026-10-11**, base Git `884d7f5`, branch
+`codex/correcoes-relatorio-ep1`.
 
-A quinta etapa permanece registrada em `e61ce88`, com exatamente 11 arquivos,
-após última revisão pré-commit e nova verificação do coordenador aprovadas.
-Merge local por fast-forward autorizado da branch `codex/etapa5-logs-estatisticas`
-concluído, avançando a `main` de `eddae3c` para `e61ce88`; suíte pós-merge com
-111 aprovados, zero falhas e zero ignorados. Sem push; branch da etapa preservada.
-Na API, `simular` produz eventos, estatísticas, resumo e registradores finais reais,
-preservando o contrato de `executar_laco`. Revisões independentes da saída e do
-núcleo, documental e final daquela entrega aprovadas sem achados; check, suíte
-111/0/0, fmt, Clippy e diff check aprovados pelo coordenador.
+A execução principal integrada está registrada em `bf093f1`; `cb6d5f6` incluiu
+os 15 experimentos, os 30 logs, o gerador e o relatório TEX/PDF. As correções
+da revisão estão publicadas em `884d7f5`. O pedido vigente autoriza obter a
+branch nova, verificar o projeto e integrar à `main` se estiver correto,
+substituindo a restrição anterior de publicar somente a branch.
 
-As etapas anteriores permanecem registradas: sexta etapa em `bf093f1`, quinta etapa em `e61ce88`, quarta etapa em `75941d0`, contextos em `05bc657`, integrados à `main` por fast-forward autorizado de `94a9482`, com 92/0/0 pós-merge; publicação autorizada concluída até `434f43b`. Terceira etapa em `57099c4`, segunda em `8d4d172` e enunciado `ep1.pdf` em `7336c37`.
+A conferência atual aprovou 127 testes Rust e 24 testes Python, zero falhas e
+zero ignorados, além de check, fmt, Clippy, build release e whitespace.
+As 15 reexecuções release em diretórios temporários produziram logs idênticos
+às duas coleções versionadas; os 12 arquivos oficiais conferem byte a byte com
+o ZIP original. A coleta e a validação de todos os eventos foram reexecutadas;
+o TEX regenerado é idêntico ao versionado. O PDF existente foi rasterizado e
+inspecionado nas sete páginas A4. Duas revisões independentes, do núcleo Rust
+e do relatório, não encontraram problemas bloqueantes.
+
+Limites desta conferência: ReportLab está ausente e a instalação em `/tmp`
+não encontrou distribuição disponível no ambiente; a geração do PDF não foi
+reexecutada. A compilação TEX também não foi verificada. Isso não altera as
+verificações históricas de geração registradas abaixo. O artefato PDF
+existente, seu conteúdo e os dados foram conferidos nesta revisão.
+
+O Git por SSH não conseguiu acessar o remoto: configuração SSH com permissões
+inválidas e, após ignorar essa configuração, falha de resolução de github.com.
+A branch foi obtida pelo conector GitHub, com blobs, árvores e commits
+validados pelos hashes originais, preservando a versão local anterior em
+`backup/main-antes-revisao-20261011`. O histórico importado é raso em `cb6d5f6`.
+A integração autorizada será feita pelo conector, após as verificações.
+Conferência/empacotamento do ZIP e eventual submissão permanecem fora deste
+pedido, sem submissão registrada.
+
+Os registros históricos abaixo preservam commits, verificações e pendências
+do momento de cada entrega. As etapas anteriores estão em `7b92a6a`, `8d4d172`,
+`57099c4`, `75941d0`, `e61ce88` e `bf093f1`; o enunciado está em `7336c37`.
 
 ## Objetivo e escopo
 
@@ -33,8 +46,9 @@ autorizada executa instruções e quantum; a segunda implementa filas, política
 créditos e operações de espera de E/S; a terceira integra despacho, transições e
 ociosidade em um passo; a quarta completa o laço do núcleo até a conclusão; a
 quinta integra estatísticas e logs reais na API `simular`; a sexta integra essa API
-em `main`, usando o carregador e o escritor existentes. A revisão final da sexta
-etapa foi aprovada em conformidade e qualidade, sem achados; experimentos e relatório PDF exigem novo pedido.
+em `main`, usando o carregador e o escritor existentes. Os experimentos e o
+relatório estão incluídos em `cb6d5f6`; o pedido vigente verifica as correções
+e autoriza sua integração à main, sem ampliar as capacidades do escalonador.
 
 ## Estado atual por módulo
 
@@ -47,8 +61,9 @@ etapa foi aprovada em conformidade e qualidade, sem achados; experimentos e rela
 | `interpretador` | Atribuições, COM, E/S, SAIDA, validação e avanço único do PC, consumidos pelo laço | — |
 | `simulador` | Quantum, passo, `executar_laco` e `simular` com eventos, resumo e registradores finais reais, consumida por `main` | — |
 | `estatisticas` | Contadores de despachos concluídos e instruções; médias D/P e I/D em f64, com denominadores validados e overflow sem mutação parcial | — |
-| `registro` | Escritor preservado; `main` cria o log do quantum escolhido, `simular` escreve eventos e resumo reais e propaga falhas | — |
+| `registro` | Publicação em arquivo novo preserva alvos de links; eventos/resumo reais e erros propagados; revisão e testes da correção aprovados | — |
 | `main` | Recusa argumentos, valida `programas/` no diretório corrente e integra simulação, log e resumo reais | — |
+| `gerar_relatorio.py` | Logs validados, conteúdo único PDF/TEX com ReportLab; testes, geração e PDF inspecionado | Compilação TEX não verificada por infraestrutura |
 
 `main` chama `simular` após carregar programas, ler quantum e criar `logXX.txt`
 no diretório corrente. Só substitui o log do quantum escolhido após validar toda
@@ -56,6 +71,30 @@ a entrada; logs de outros quantums são preservados. Sucesso retorna código 0
 com stdout/stderr vazios após publicação final; erros retornam código 1 e
 diagnóstico em stderr. Eventos reais parciais podem permanecer após erro de
 execução ou escrita. Não há CLI configurável, lote automático ou CSV.
+
+A correção de publicação usa arquivo novo para substituir o nome do log,
+preservando o alvo de links simbólicos e hardlinks preexistentes; destino
+diretório causa erro. O gerador usa a raiz do próprio script para entradas e
+saídas, lê e valida eventos e resumos dos logs antes de gerar PDF e TEX do mesmo
+conteúdo. Não executa novos experimentos nem roda o binário Rust. O TEX pode ser editado no editor
+LaTeX, mas regenerar pelo script substitui ambos os arquivos; alterações
+duráveis do conteúdo devem ser feitas no gerador.
+
+A geração deste relatório exige a identidade semântica da carga oficial original
+(os dez arquivos, nomes, prioridades e instruções), os 15 quantums previstos e
+a recomendação compatível com q7. Divergência é recusada antes de renderizar ou
+publicar PDF/TEX. As funções de carregar, validar e coletar permanecem genéricas
+para testes. UTF-8 é lido por bytes, com separação de linhas LF/CRLF conforme
+Rust. `quantum.txt` aceita valor positivo; q3 é o valor da entrada original
+fornecida, não uma configuração atual obrigatória.
+
+A dependência ReportLab é exclusiva da geração do PDF; o binário Rust continua
+usando somente `std`. As instruções do README incluem
+`python3 -m pip install -r requirements-relatorio.txt`,
+`python3 gerar_relatorio.py` e
+`python3 -m unittest discover -s tests -p 'test_relatorio.py'`.
+O comando de instalação é orientação para o ambiente do usuário, não uma
+instalação executada neste registro.
 
 ## Decisões vigentes
 
@@ -111,9 +150,19 @@ execução ou escrita. Não há CLI configurável, lote automático ou CSV.
   registra o passo integrado; o [plano da quarta etapa](docs/superpowers/plans/2026-10-11-etapa4-laco-simulacao.md)
   registra o laço completo; o [plano da quinta etapa](docs/superpowers/plans/2026-10-11-etapa5-logs-estatisticas.md)
   registra estatísticas e logs reais na API; o [plano da sexta etapa](docs/superpowers/plans/2026-10-11-etapa6-execucao-integrada.md)
-  registra a execução principal autorizada. Experimentos e relatório exigem novo pedido.
+  registra a execução principal implementada em `bf093f1`. Os experimentos e o
+  relatório estão em `cb6d5f6`; o plano de correções atual rege esta entrega.
+- Manter q7 como recomendação prática desta carga: menor quantum testado que
+  alcança pelo menos 85% da média máxima de instruções por despacho. A carga tem
+  139 instruções e 33 segmentos, com saturação em q21. A série principal 1…10 é
+  uniforme e os pontos 12,15,20,25,30 são exploração complementar. Não inferir
+  custo real, throughput ou responsividade geral das médias D/P e I/D;
+  distinguir D do EP de troca física de contexto e `(I/D)/q` de utilização real.
 
-## Sequência proposta de implementação e verificação
+## Etapas implementadas e próximas verificações
+
+As caixas concluídas abaixo resumem as entregas históricas; suas contagens
+pertencem àquelas etapas, não à correção local atual.
 
 - [x] Preparar modelos, entrada validada, tabela e escritor de log.
 - [x] Implementar interpretador e quantum; testes de atribuições, COM, PC único,
@@ -143,8 +192,16 @@ execução ou escrita. Não há CLI configurável, lote automático ou CSV.
   117/0/0, fmt em modo check, Clippy com warnings negados e diff check.
 - [x] Revisão documental/final da sexta etapa aprovada em conformidade e
   qualidade, sem achados críticos, importantes ou menores.
-- [ ] Próximo passo proposto, após novo pedido: executar manualmente ao menos dez quantums uniformemente distribuídos em
-  intervalo útil; reunir logs, médias, tabelas e gráficos para justificar o quantum no PDF.
+- [x] Incluir os 15 quantums, logs e relatório em `cb6d5f6`.
+- [x] Verificar correções Rust, gerador, 15 reexecuções oficiais e PDF final;
+  resultados específicos registrados abaixo.
+- [x] Concluir revisão independente final das correções autorizadas: conformidade e qualidade aprovadas, sem achados pendentes.
+- [x] Registrar as correções em `884d7f5` e publicar somente
+  `codex/correcoes-relatorio-ep1`, sem merge ou alteração da `main`.
+- [ ] Conferir material e preparar o ZIP de código, logs e PDF conforme o enunciado,
+  após autorização para empacotamento.
+- [ ] Confirmar com a disciplina a situação administrativa do prazo de 04/10/2026
+  e eventual submissão; não há submissão registrada nesta entrega.
 
 Ideia dentro do escopo: usar programas pequenos com resultado calculado à mão
 antes dos arquivos oficiais, para localizar erros de ordem e contagem. É uma
@@ -179,6 +236,10 @@ proposta de validação, não uma funcionalidade adicional prometida.
 
 | 2026-10-11 | Trabalho sobre `5ca6f6c` | Usuário autorizou commit da sexta etapa, merge na `main` e push. HEAD e `main` ainda em `5ca6f6c`, oito arquivos da entrega sem stage (sete rastreados e o plano novo); novas conferências e operações Git pendentes. Experimentos e relatório continuam fora deste pedido. |
 | 2026-10-11 | `bf093f1` | Sexta etapa commitada (`feat: integrated execution`), integrada à `main` por fast-forward de `5ca6f6c` e publicada no `origin/main`. Suíte 117/0/0, execução com entradas oficiais validada (q3, código 0, log03.txt, 10 processos, 59 despachos, 139 instruções, médias 5.9 e 2.3559...). Checks globais aprovados. |
+| 2026-10-11 | `cb6d5f6` | Inclusão dos 15 experimentos, duas coleções de logs, gerador e relatório TEX/PDF. |
+| 2026-10-11 | Trabalho local sem commit sobre `cb6d5f6` | Correções autorizadas implementadas na branch `codex/correcoes-relatorio-ep1`: publicação preservando alvos de links, dados validados e conteúdo único PDF/TEX via ReportLab, argumentação e documentação corrigidas. Coordenador: Rust127/0/0, Python24/0/0, checks, geração e PDF aprovados; 15 reexecuções idênticas e 54 protegidos intactos. Revisão independente final aprovada em conformidade e qualidade, sem achados pendentes; compilação TEX não verificada por infraestrutura. Sem commit, merge ou push. |
+| 2026-10-11 | Autorização sobre `cb6d5f6` | Usuário autorizou commit das correções e push somente de `codex/correcoes-relatorio-ep1`, proibindo merge e alteração da `main`. Operações ainda pendentes; sem hash ou publicação antecipados. |
+| 2026-10-11 | `884d7f5` | Correções registradas em 17 arquivos e publicadas somente em `origin/codex/correcoes-relatorio-ep1`; push retornou código 0 e consulta remota confirmou o commit. Sem merge; `main` local/remota permaneceu em `cb6d5f6`. |
 
 Verificação da entrega `748077f`: `cargo check --all-targets`, `cargo fmt --check`,
 `cargo clippy --all-targets -- -D warnings` e `git diff --check` aprovados;
@@ -492,6 +553,82 @@ para `bf093f1` e publicado no `origin/main` (código 0). Working tree limpo.
 Branch da etapa pode ser removida. Suíte pós-merge: 117/0/0. Execução integrada
 validada no diretório do projeto com `cargo run --bin Escalonador`: quantum 3,
 `log03.txt` publicado, resumo real, código 0.
+
+## Verificação das correções da revisão
+
+Correções autorizadas e implementadas localmente na branch
+`codex/correcoes-relatorio-ep1`, sobre `cb6d5f6`. Após a revisão, o usuário
+autorizou commit e push somente dessa branch, concluídos para as correções em
+`884d7f5`; não houve merge ou alteração da `main`. A revisão independente da publicação de logs foi aprovada;
+a revisão documental do snapshot anterior foi aprovada em conformidade e
+qualidade, sem achados. A reavaliação das correções do relatório e a revisão
+final do conjunto foram aprovadas em conformidade e qualidade, sem achados
+pendentes; as duas ressalvas P3 da primeira revisão do relatório foram resolvidas.
+
+Resultados executados pelo coordenador após o encerramento da autoria e revisão
+da correção Rust: `cargo check --all-targets`, `cargo test`, `cargo fmt --check`,
+`cargo clippy --all-targets -- -D warnings` e `cargo build --bin Escalonador`,
+todos com código 0. Suíte: **127 aprovados, zero falhas e zero ignorados**,
+com seis testes de lib e 121 de integração; zero testes de main e zero doctests.
+
+O coordenador reexecutou os 15 quantums oficiais em cópias temporárias das
+entradas: todos retornaram código 0 e stdout/stderr vazios; os logs produzidos
+conferem byte a byte com as duas coleções versionadas. As cópias permaneceram
+intactas e não restou arquivo temporário de publicação. Os 54 arquivos
+protegidos do snapshot conferem com a base: entradas, enunciado, logs e acervo
+preservados conforme a lista de proteção da entrega.
+
+Após a autoria do gerador, o coordenador executou
+`python3 -m unittest discover -s tests -p 'test_relatorio.py'`:
+**24 aprovados, zero falhas, zero erros e zero ignorados**.
+`python3 -m py_compile gerar_relatorio.py tests/test_relatorio.py` aprovado.
+A geração de PDF e TEX com o Python disponibilizado pelo ambiente, executada
+por caminho absoluto a partir de `/tmp`, retornou código 0. O gerador valida
+ambas as coleções com reconstrução independente de eventos, créditos, filas,
+esperas, PC, X/Y e estatísticas; não executa novos experimentos nem roda o
+binário Rust. A importação e os testes usam somente a biblioteca padrão;
+ReportLab é carregado na geração do PDF.
+
+A rodada posterior à primeira revisão do relatório corrigiu a equivalência
+de parsing com Rust e delimitou a geração à identidade semântica original da
+carga oficial. O coordenador confirmou novamente 24 testes Python aprovados,
+py_compile, geração a partir de `/tmp`, suíte Rust127/0/0, check, fmt, Clippy,
+build e diff check aprovados, com 54 arquivos protegidos intactos. PDF/TEX
+foram regenerados com os mesmos resultados oficiais, sem novos experimentos.
+
+PDF final: **sete páginas A4**, todas rasterizadas e inspecionadas. Fontes
+Vera Roman/Bold efetivamente usadas incorporadas, tabelas legíveis e ticks dos
+gráficos exatos, sem sobreposição de rótulos. `git diff --check` aprovado.
+
+O TEX foi aberto no editor LaTeX e preservado. A tentativa de compilação
+integrada falhou por infraestrutura: bundle Tectonic v33 indisponível no cache
+e falha de download pelo relay, sem diagnóstico de erro de fonte. Portanto,
+**compilação TEX não verificada**; o PDF ReportLab é o artefato visual verificado.
+Não houve instalação TeX, empacotamento ZIP ou submissão registrada.
+
+Fechamento da revisão independente final: conformidade e qualidade aprovadas,
+sem achados críticos, importantes ou menores pendentes. As duas ressalvas P3
+da revisão inicial do relatório foram corrigidas e confirmadas na reavaliação.
+O estado das correções é implementado, verificado, revisado e publicado somente
+na branch `codex/correcoes-relatorio-ep1`, no commit `884d7f5`, sem merge ou
+alteração da `main`. O push autorizado (`git push -u origin
+HEAD:refs/heads/codex/correcoes-relatorio-ep1`) retornou código 0; a consulta
+remota confirmou a branch em `884d7f5eac59d732f443f1e5a8da91b3b96bce6c` e
+`main` em `cb6d5f6f74545f3f86c6e8a626a483fa26d5f53e`, iguais às referências
+local/remota da `main`. A árvore estava limpa antes deste registro documental.
+Não houve nova execução de testes neste fechamento: permanecem as evidências
+127 Rust/24 Python acima. Este registro documental acompanha a publicação das
+correções na mesma branch; identifica `884d7f5`, sem atribuir um hash ao próprio
+registro. Permanecem conferência/empacotamento e confirmação administrativa
+do prazo e eventual submissão, além da limitação TEX registrada.
+
+## Nova conferência para integração — 2026-10-11
+
+O usuário autorizou substituir a versão local pela branch publicada `884d7f5`
+e integrar à `main` após validação. A conferência e as duas revisões independentes
+foram aprovadas conforme o resumo atual acima. Nenhuma alteração de código,
+entrada, log ou relatório foi necessária; somente o estado documental foi
+atualizado para refletir a autorização e os limites desta rodada.
 
 ## Como manter
 

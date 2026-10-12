@@ -1,49 +1,62 @@
 # EP1 — Escalonador
 
-Base do EP1 de Sistemas Operacionais de 2026 em Rust stable, edição 2021, com Cargo e somente a biblioteca padrão. `programas/` preserva os 12 arquivos oficiais: dez processos, `prioridades.txt` e `quantum.txt`.
+Escalonador do EP1 de Sistemas Operacionais de 2026 em Rust stable, edição 2021, com Cargo e somente a biblioteca padrão. Os 12 arquivos oficiais de `programas/` são preservados: dez processos, `prioridades.txt` e `quantum.txt`. O [enunciado](ep1.pdf) define os requisitos.
 
-Estado, decisões e próximos passos: [Histórico do projeto](HISTORICO.md).
+A execução integrada foi registrada em `bf093f1`; os 15 experimentos, suas duas coleções de logs e o relatório foram incluídos em `cb6d5f6`. As correções estão publicadas em `884d7f5`, na branch `codex/correcoes-relatorio-ep1`. O pedido vigente autoriza sua integração à `main` após validação. A nova conferência aprovou os 127 testes Rust, os 24 testes Python, as 15 reexecuções dos experimentos e as revisões independentes do núcleo e do relatório, sem achados bloqueantes. O [histórico](HISTORICO.md) registra as evidências e limitações desta conferência.
 
-Fluxo de desenvolvimento com Superpowers: [instruções](AGENTS.md), [contexto vigente](docs/superpowers/plans/2026-10-10-contexto-atual.md), [plano da primeira etapa](docs/superpowers/plans/2026-10-10-etapa1-interpretador-quantum.md), [plano da segunda etapa](docs/superpowers/plans/2026-10-10-etapa2-filas-politica.md), [plano da terceira etapa](docs/superpowers/plans/2026-10-11-etapa3-transicoes-es.md), [plano da quarta etapa](docs/superpowers/plans/2026-10-11-etapa4-laco-simulacao.md), [plano da quinta etapa](docs/superpowers/plans/2026-10-11-etapa5-logs-estatisticas.md), [plano da sexta etapa](docs/superpowers/plans/2026-10-11-etapa6-execucao-integrada.md) e [índice e acervo](docs/superpowers/README.md).
+## Executar o escalonador
 
-Execute na raiz deste projeto, onde estão `programas/` e o [enunciado de 2026](ep1.pdf):
+Execute na raiz do projeto, onde está `programas/`:
 
 ```bash
 cargo run --bin Escalonador
+```
+
+Para compilar a versão otimizada, use `cargo build --release --bin Escalonador` e execute `./target/release/Escalonador`. O binário resolve `programas/` e `logXX.txt` pelo diretório corrente. Primeiro valida programas, prioridades e quantum; depois publica o log correspondente ao quantum lido. Logs de outros quantums são preservados. Em sucesso, encerra com código 0 e stdout/stderr vazios após publicar os eventos e o resumo reais; falhas retornam código 1 com diagnóstico em stderr. Argumentos são recusados antes da criação do log. Não há CLI configurável, lote automático ou CSV.
+
+A correção da publicação substitui o nome de destino por um arquivo novo, preservando o alvo de links simbólicos e hardlinks preexistentes. Um destino que seja diretório causa erro. Cada evento é publicado durante a execução; eventos reais parciais podem permanecer após falha de CPU ou escrita, sem um retorno de sucesso.
+
+## Modelo e convenções
+
+- A tabela possui os BCPs; filas guardam somente `ProcessId`. O BCP mantém PC, estado, prioridade, créditos, registradores, programa e espera de E/S.
+- Toda instrução, inclusive E/S e SAIDA, consome uma unidade e avança o PC uma vez. E/S e SAIDA prevalecem sobre o limite do quantum; a retomada começa na instrução seguinte.
+- Créditos começam na prioridade e caem um por despacho sem ficar negativos. A redistribuição ocorre somente quando todos os ativos, inclusive bloqueados, têm zero.
+- Empate inicial segue a ordem dos arquivos. Ao fim do quantum, o processo volta antes dos créditos iguais; no retorno de E/S, depois dos iguais. Se prontos têm zero e algum bloqueado tem crédito, usar FIFO; prioridades todas zero também usam FIFO.
+- E/S bloqueia por dois surtos posteriores, inclusive surtos curtos e repetições de um mesmo outro PID. O surto que bloqueou não reduz a própria espera. Liberação segue FIFO; sem prontos, somente a espera lógica avança.
+- `executar_laco` consome os passos até a conclusão e devolve os registradores finais reais. Entrada vazia com quantum positivo devolve mapa vazio. `simular` recusa entrada vazia pelos denominadores indefinidos e integra eventos e estatísticas ao núcleo.
+- PC inválido e quantum zero são recusados; erros posteriores preservam o progresso válido. Erro da CPU após despacho preserva o BCP Executando fora das filas, sem recuperação automática.
+
+`simular` registra Carregando na ordem inicial de prontos, Executando antes de cada surto, E/S antes de Interrompendo e Terminado com X/Y finais reais. A interrupção informa apenas as instruções do último surto. Para P processos iniciais, D despachos concluídos e I instruções executadas, as médias são D/P e I/D. D inclui término e despachos consecutivos do mesmo PID; I inclui E/S e SAIDA; ociosidade não conta. A contagem de trocas definida no EP não equivale necessariamente à troca física de contexto.
+
+## Experimentos e relatório
+
+Há logs para os quantums `1,2,3,4,5,6,7,8,9,10,12,15,20,25,30` na raiz e em `experimentos/`. A série principal `1…10` é uniforme; os demais pontos exploram a saturação. A carga oficial soma 139 instruções e 33 segmentos terminados por E/S ou SAIDA; o maior segmento tem 21 instruções. A partir de q21, são necessários 33 despachos e a média máxima desta carga é 139/33.
+
+O conteúdo e os dados do relatório têm uma fonte única em `gerar_relatorio.py`: o gerador lê e valida programas, eventos e resumos das duas coleções de logs antes de produzir `relatorio_ep1.pdf` e `relatorio_ep1.tex`. Ele reconstrói PC, instruções e registradores dos eventos; não executa novos experimentos nem roda o binário Rust. As entradas e as saídas são resolvidas pela raiz do próprio script, inclusive quando invocado de outro diretório.
+
+A geração deste relatório é específica da carga oficial original: exige os mesmos dez arquivos, nomes, prioridades e instruções, os 15 quantums previstos e uma recomendação compatível com q7. Uma divergência é recusada antes de renderizar ou substituir PDF/TEX. As funções de carregamento, validação e coleta permanecem genéricas para testes; gerar um relatório de outra carga exige adaptar seu conteúdo e recorte. A leitura UTF-8 usa as mesmas regras de linhas LF/CRLF do carregador Rust. `quantum.txt` precisa conter um valor positivo; q3 é o valor da entrada original fornecida, não uma exigência de configuração atual.
+
+O escalonador Rust continua usando somente `std`. A geração do PDF usa Python e ReportLab, cuja dependência está em `requirements-relatorio.txt`. Para preparar o ambiente Python e gerar o relatório:
+
+```bash
+python3 -m pip install -r requirements-relatorio.txt
+python3 gerar_relatorio.py
+```
+
+O TEX é gerado do mesmo conteúdo do PDF e pode ser aberto no editor LaTeX para edição e preview. Regenerar pelo script substitui ambos os arquivos; para manter alterações, edite o conteúdo no gerador. O PDF produzido pelo script é o artefato de entrega.
+
+q7 permanece como recomendação prática para esta carga: é o menor quantum testado que alcança pelo menos 85% da média máxima de instruções por despacho. O critério é escolhido pelos autores, sem alegar ótimo universal, tempo de resposta aceitável, throughput ou custo real não medidos. O relatório distingue a razão `(I/D)/q` de utilização real da CPU.
+
+## Verificar e preparar a entrega
+
+```bash
 cargo check --all-targets
 cargo test
 cargo fmt --check
+cargo clippy --all-targets -- -D warnings
+python3 -m unittest discover -s tests -p 'test_relatorio.py'
 ```
 
-Opcionalmente, compile com `cargo build --release --bin Escalonador` e execute `./target/release/Escalonador` no mesmo diretório. A entrada vem exclusivamente de `programas/`, incluindo prioridades e quantum. O binário usa o diretório corrente: primeiro valida programas, prioridades e quantum; depois cria ou substitui somente `logXX.txt` correspondente ao quantum lido, preservando logs de outros quantums. Em sucesso, encerra com código 0 e stdout/stderr vazios após publicar eventos e resumo reais; falhas retornam código 1 com diagnóstico em stderr. Argumentos, inclusive as opções antigas, são recusados antes de criar ou truncar o log.
+Na verificação histórica de autoria, o coordenador verificou a correção com 127 testes Rust e 24 testes Python aprovados, zero falhas e zero ignorados; check, fmt, Clippy, build e conferência de whitespace também aprovados. As 15 reexecuções oficiais conferem byte a byte com ambas as coleções de logs; 54 arquivos protegidos foram preservados. O PDF final tem sete páginas A4, todas renderizadas e inspecionadas. O TEX foi aberto no editor, mas sua compilação não foi verificada: o compilador integrado não conseguiu obter o bundle Tectonic necessário. O PDF ReportLab é o artefato visual verificado. Os detalhes ficam no [histórico](HISTORICO.md). Faltam conferir o material e preparar o ZIP com código, logs e PDF conforme o enunciado. O prazo escrito no enunciado é 04/10/2026; a situação administrativa e eventual submissão devem ser confirmadas com a disciplina. Não há submissão registrada nesta entrega.
 
-Modelos, carregamento e validação das entradas, tabela de processos e escrita dos eventos fornecidos estão implementados. A primeira etapa implementa `executar_instrucao` e `executar_quantum` sobre um BCP: atribuições, COM, E/S e SAIDA avançam o PC uma vez; E/S e SAIDA interrompem e contam na execução, inclusive na fronteira do quantum. A retomada começa na instrução seguinte, preservando registradores e os demais campos do BCP.
-
-PC fora do texto retorna `EstadoInvalido` sem mutação da instrução inválida. Quantum zero retorna `Entrada` antes de consultar o PC e sem modificar o BCP; um erro após instruções válidas preserva o progresso já executado. Estado, créditos e espera não são alterados pelo interpretador ou quantum.
-
-A segunda etapa implementa carga e seleção de prontos, reordenação estável por créditos, reinserções de quantum e retorno de E/S, desconto saturado e redistribuição de créditos. Filas guardam somente IDs e validam existência, estado e duplicidade antes de mutar. A seleção não altera o estado do BCP; o passo integrado define Executando e aplica as transições posteriores.
-
-As operações de E/S também estão implementadas: bloquear exige Executando, define Bloqueado e espera 2; avançar esperas desconta somente os IDs de um snapshot anterior validado e libera elegíveis em FIFO, definindo Pronto e espera 0. Novos bloqueados não perdem espera no próprio surto. A terceira etapa integra essas operações em `executar_passo`: valida tabela e filas antes do despacho, redistribui quando necessário, desconta um crédito, executa um quantum e aplica a parada real. Quantum recoloca Pronto; E/S bloqueia; SAIDA remove e devolve o BCP proprietário com seu contexto final. Ao fim do surto, somente os bloqueados anteriores avançam e os liberados retornam em FIFO após empates. Sem prontos, um passo avança uma unidade lógica de espera sem CPU ou alteração de créditos.
-
-`ResultadoPasso` distingue `Surto` (resultado real e BCP terminado opcional), `Ocioso` (IDs liberados) e `Concluido` (tabela e filas vazias). Quantum zero e inconsistências estruturais falham antes de mutar. Erro da CPU após o despacho preserva o BCP Executando fora das filas, o crédito descontado e o progresso válido, sem avançar esperas. Não há recuperação automática: uma nova chamada rejeita esse estado inconsistente.
-
-`executar_laco` completa a quarta etapa do núcleo: prepara a tabela proprietária e as filas, consome `executar_passo` até a conclusão e devolve os registradores finais reais em `HashMap<ProcessId, (i64, i64)>`. Com quantum positivo e entrada vazia, devolve mapa vazio; quantum zero é recusado antes da preparação. Surtos e ociosidade prosseguem sem limite artificial, e erros são propagados. Quinze testes novos cobrem casos calculados à mão e uma execução das entradas oficiais, incluindo registradores prévios, E/S consecutivas, prioridades zero e erros após progresso.
-
-O código e os testes da quarta etapa foram registrados em `75941d0` (`feat: implement complete core simulation loop`). Os contextos foram registrados em `05bc657`; ambos os commits foram integrados localmente à `main` por fast-forward autorizado de `94a9482`. A suíte pós-merge teve 92 aprovados, zero falhas e zero ignorados. Após autorização do usuário, a publicação em `origin/main` foi concluída até `434f43b`.
-
-A quinta etapa implementa `simular` com eventos, contagens, resumo e registradores finais reais. O trabalho foi desenvolvido na branch `codex/etapa5-logs-estatisticas`, criada de `eddae3c`, e registrado no commit `e61ce88` com os 11 arquivos da etapa após última revisão pré-commit aprovada em conformidade e qualidade sem achados e nova verificação do coordenador aprovada (check, suíte 111/0/0, fmt e Clippy). O merge local por fast-forward avançou a `main` de `eddae3c` para `e61ce88`; `cargo test` pós-merge teve 111 aprovados, zero falhas e zero ignorados. Sem push; a branch da etapa foi preservada. A suíte do autor do núcleo teve 111 aprovados, zero falhas e zero ignorados; as revisões independentes da saída e do núcleo foram aprovadas em conformidade e qualidade, sem achados. O coordenador aprovou check de todos os alvos, suíte com 111/0/0, fmt em modo check, Clippy com warnings negados e diff check. Entradas e acervo conferidos contra `eddae3c`; revisão documental e final do conjunto aprovada em conformidade e qualidade, sem achados críticos, importantes ou menores.
-
-`simular` valida quantum positivo, entrada não vazia, PIDs únicos e estado/espera inicial antes de escrever eventos. A entrada vazia é recusada porque as médias teriam denominadores indefinidos; o contrato de mapa vazio de `executar_laco` permanece preservado. Erros da CPU ou da escrita são propagados sem resultado de sucesso; eventos reais já escritos podem permanecer, e falhas antes da conclusão não produzem resumo de sucesso. A API escreve o resumo após a conclusão e propaga a falha de publicação final antes de devolver sucesso.
-
-A sexta etapa integra `main` com `carregar_programas`, `ler_quantum`, `RegistroLog` e `simular`, conforme o plano específico. Está em trabalho sem commit na branch `codex/etapa6-execucao-integrada`, sobre `5ca6f6c`. O usuário autorizou commit, merge na `main` e push; essas operações ainda estão pendentes. O autor registrou RED compilável com 5 aprovados, 6 falhas esperadas e zero ignorados; GREEN do alvo de execução com 11/0/0 e suíte completa com 117/0/0. Os testes verificam logs literais para q1, q2 com retomada de E/S e q3, substituição seletiva de log, entradas inválidas preservando log anterior e erros de criação/publicação. Revisão independente de código aprovada em conformidade e qualidade, sem achados. O coordenador conferiu a execução das entradas oficiais copiadas em diretório temporário com q3: código 0, streams vazios, dez términos e resumo real, com originais e cópias intactos. Checks globais do coordenador aprovados: check de todos os alvos, suíte 117/0/0, fmt em modo check, Clippy com warnings negados e diff check. Revisão documental/final aprovada em conformidade e qualidade, sem achados críticos, importantes ou menores.
-
-Convenções vigentes conforme o [enunciado de 2026](ep1.pdf):
-
-- A tabela possui os BCPs; filas guardam somente `ProcessId`. Toda instrução, inclusive E/S e SAIDA, consome uma unidade e avança o PC uma vez; E/S retoma na seguinte.
-- Créditos começam na prioridade; escolher o maior crédito pronto e descontar um por despacho, sem ficar negativo. Redistribuir as prioridades somente quando todos os ativos, inclusive bloqueados, têm zero. Terminados não participam.
-- Empate inicial segue a ordem dos arquivos; ao fim do quantum, reinserir antes dos créditos iguais; no retorno de E/S, depois dos iguais, em ordem de retorno. Se prontos têm zero e algum bloqueado tem crédito, usar FIFO e reinserir ao final. Prioridades todas zero também usam FIFO.
-- E/S bloqueia por dois surtos posteriores de outro processo, mesmo que sejam do mesmo PID entre si ou terminem antes do quantum. O surto que bloqueou não reduz a espera. Atualizar os bloqueados anteriores e liberar elegíveis em FIFO ao final de cada surto. Sem prontos, avançar somente a espera lógica, sem instruções, créditos ou despachos.
-
-`simular` usa o escritor UTF-8 para registrar Carregando na ordem inicial de prontos e Executando antes de cada surto. E/S escreve EntradaSaida antes de Interrompendo; a interrupção informa somente as instruções do último surto. SAIDA escreve Terminado com X/Y reais, sem interrupção adicional. Após a conclusão, escreve as médias e o quantum. A execução principal cria `logXX.txt` no diretório corrente somente após validar toda a entrada. Para P processos iniciais, D despachos concluídos e I instruções executadas: média de trocas = D/P; média de instruções = I/D, com divisão em ponto flutuante e denominadores válidos. Cada surto conta em D, inclusive término e despachos consecutivos do mesmo PID; E/S e SAIDA contam em I; ociosidade não conta.
-
-Os experimentos e o relatório PDF exigidos pelo EP continuam obrigatórios como trabalho futuro: após concluir a verificação da execução principal e receber novo pedido, executar manualmente pelo menos dez valores de quantum distribuídos uniformemente em um intervalo útil, reunir logs e médias, elaborar tabelas e gráficos e justificar a escolha de quantum com os dados. Esta base não produz resultados experimentais nem o relatório.
+Fluxo de desenvolvimento: [AGENTS](AGENTS.md), [contexto vigente](docs/superpowers/plans/2026-10-10-contexto-atual.md), [plano das correções](docs/superpowers/plans/2026-10-11-correcoes-revisao-relatorio.md) e [índice Superpowers](docs/superpowers/README.md).

@@ -166,11 +166,59 @@ fn falha_de_criacao_do_log_retorna_erro_de_es() {
 
 #[cfg(target_os = "linux")]
 #[test]
-fn falha_de_publicacao_do_log_retorna_erro_de_es() {
+fn link_para_dev_full_e_substituido_sem_escrever_no_dispositivo() {
     let entradas = Entradas::novas();
     std::os::unix::fs::symlink("/dev/full", entradas.0.join("log03.txt")).unwrap();
-    let mensagem = erro(&entradas.executar(&[]));
-    assert!(mensagem.contains("Erro de E/S"), "{mensagem}");
+    sucesso(&entradas.executar(&[]));
+    assert_eq!(entradas.log("log03.txt"), LOG_PEQUENO_Q3);
+    assert!(fs::symlink_metadata(entradas.0.join("log03.txt"))
+        .unwrap()
+        .is_file());
+    assert_eq!(fs::read_dir(&entradas.0).unwrap().count(), 2);
+}
+
+#[cfg(unix)]
+#[test]
+fn log_ligado_a_qualquer_entrada_preserva_todos_os_bytes() {
+    for nome in ["01.txt", "prioridades.txt", "quantum.txt"] {
+        let entradas = Entradas::novas();
+        let alvo = entradas.0.join("programas").join(nome);
+        let antes = fs::read(&alvo).unwrap();
+        std::os::unix::fs::symlink(&alvo, entradas.0.join("log03.txt")).unwrap();
+        sucesso(&entradas.executar(&[]));
+        assert_eq!(fs::read(&alvo).unwrap(), antes, "{nome}");
+        assert_eq!(entradas.log("log03.txt"), LOG_PEQUENO_Q3);
+        assert!(fs::symlink_metadata(entradas.0.join("log03.txt"))
+            .unwrap()
+            .is_file());
+        assert_eq!(fs::read_dir(&entradas.0).unwrap().count(), 2);
+    }
+}
+
+#[cfg(unix)]
+#[test]
+fn log_ligado_a_outro_quantum_preserva_o_log_anterior() {
+    let entradas = Entradas::novas();
+    fs::write(entradas.0.join("log01.txt"), LOG_ANTERIOR).unwrap();
+    std::os::unix::fs::symlink("log01.txt", entradas.0.join("log03.txt")).unwrap();
+    sucesso(&entradas.executar(&[]));
+    assert_eq!(
+        fs::read(entradas.0.join("log01.txt")).unwrap(),
+        LOG_ANTERIOR
+    );
+    assert_eq!(entradas.log("log03.txt"), LOG_PEQUENO_Q3);
+    assert_eq!(fs::read_dir(&entradas.0).unwrap().count(), 3);
+}
+
+#[test]
+fn log_com_hardlink_a_entrada_preserva_os_bytes_originais() {
+    let entradas = Entradas::novas();
+    let alvo = entradas.0.join("programas/01.txt");
+    let antes = fs::read(&alvo).unwrap();
+    fs::hard_link(&alvo, entradas.0.join("log03.txt")).unwrap();
+    sucesso(&entradas.executar(&[]));
+    assert_eq!(fs::read(&alvo).unwrap(), antes);
+    assert_eq!(entradas.log("log03.txt"), LOG_PEQUENO_Q3);
     assert_eq!(fs::read_dir(&entradas.0).unwrap().count(), 2);
 }
 

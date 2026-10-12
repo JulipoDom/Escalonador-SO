@@ -112,18 +112,69 @@ fn criacao_propaga_erro_de_io() {
         Err(ErroEp::Io(_))
     ));
 }
-#[cfg(target_os = "linux")]
+#[cfg(unix)]
 #[test]
-fn falha_de_flush_e_propagada() {
+fn log_ligado_a_entrada_substitui_link_e_preserva_entrada() {
     use std::os::unix::fs::symlink;
     let tmp = Temporario::novo();
-    symlink("/dev/full", tmp.0.join("log03.txt")).unwrap();
+    let entrada = tmp.0.join("01.txt");
+    fs::write(&entrada, b"P\nX=7\nSAIDA\n").unwrap();
+    symlink(&entrada, tmp.0.join("log03.txt")).unwrap();
     let mut log = RegistroLog::criar(&tmp.0, 3).unwrap();
-    assert!(matches!(
-        log.registrar(EventoLog::Executando("P")),
-        Err(ErroEp::Io(_))
-    ));
-    assert!(matches!(log.finalizar(), Err(ErroEp::Io(_))));
+    assert_eq!(fs::read(&entrada).unwrap(), b"P\nX=7\nSAIDA\n");
+    log.registrar(EventoLog::Executando("P")).unwrap();
+    assert_eq!(
+        fs::read_to_string(tmp.0.join("log03.txt")).unwrap(),
+        "Executando P\n"
+    );
+    assert_eq!(fs::read(&entrada).unwrap(), b"P\nX=7\nSAIDA\n");
+    assert!(fs::symlink_metadata(tmp.0.join("log03.txt"))
+        .unwrap()
+        .is_file());
+    assert_eq!(fs::read_dir(&tmp.0).unwrap().count(), 2);
+}
+#[test]
+fn log_com_hardlink_preserva_bytes_do_outro_nome() {
+    let tmp = Temporario::novo();
+    let outro = tmp.0.join("log01.txt");
+    fs::write(&outro, b"log anterior\n").unwrap();
+    fs::hard_link(&outro, tmp.0.join("log03.txt")).unwrap();
+    let mut log = RegistroLog::criar(&tmp.0, 3).unwrap();
+    assert_eq!(fs::read(&outro).unwrap(), b"log anterior\n");
+    log.registrar(EventoLog::Executando("P")).unwrap();
+    assert_eq!(fs::read(&outro).unwrap(), b"log anterior\n");
+    assert_eq!(
+        fs::read_to_string(tmp.0.join("log03.txt")).unwrap(),
+        "Executando P\n"
+    );
+    assert_eq!(fs::read_dir(&tmp.0).unwrap().count(), 2);
+}
+#[test]
+fn destino_diretorio_falha_sem_alteracao_ou_temporario_residual() {
+    let tmp = Temporario::novo();
+    let destino = tmp.0.join("log03.txt");
+    fs::create_dir(&destino).unwrap();
+    fs::write(destino.join("preservado"), b"anterior").unwrap();
+    assert!(matches!(RegistroLog::criar(&tmp.0, 3), Err(ErroEp::Io(_))));
+    assert_eq!(fs::read(destino.join("preservado")).unwrap(), b"anterior");
+    assert_eq!(fs::read_dir(&tmp.0).unwrap().count(), 1);
+    assert_eq!(fs::read_dir(destino).unwrap().count(), 1);
+}
+#[cfg(target_os = "linux")]
+#[test]
+fn link_para_dev_full_e_substituido_por_log_regular() {
+    let tmp = Temporario::novo();
+    std::os::unix::fs::symlink("/dev/full", tmp.0.join("log03.txt")).unwrap();
+    let mut log = RegistroLog::criar(&tmp.0, 3).unwrap();
+    log.registrar(EventoLog::Executando("P")).unwrap();
+    log.finalizar().unwrap();
+    assert_eq!(
+        fs::read_to_string(tmp.0.join("log03.txt")).unwrap(),
+        "Executando P\n"
+    );
+    assert!(fs::symlink_metadata(tmp.0.join("log03.txt"))
+        .unwrap()
+        .is_file());
 }
 #[test]
 fn calcula_medias_com_divisao_fracionaria() {
