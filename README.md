@@ -2,7 +2,7 @@
 
 Escalonador do EP1 de Sistemas Operacionais de 2026 em Rust stable, edição 2021, com Cargo e somente a biblioteca padrão. Os 12 arquivos oficiais de `programas/` são preservados: dez processos, `prioridades.txt` e `quantum.txt`. O [enunciado](ep1.pdf) define os requisitos.
 
-A execução integrada foi registrada em `bf093f1`; os 15 experimentos, suas duas coleções de logs e o relatório foram incluídos em `cb6d5f6`. As correções da revisão estão implementadas e verificadas localmente na branch `codex/correcoes-relatorio-ep1`, sobre `cb6d5f6`. O usuário autorizou commit das alterações e push somente desta branch; as operações ainda estão pendentes. Merge e alteração da `main` estão proibidos neste pedido. A revisão independente final do conjunto foi aprovada em conformidade e qualidade, sem achados pendentes. O [histórico](HISTORICO.md) distingue as verificações anteriores das verificações desta correção.
+A execução integrada foi registrada em `bf093f1`; os 15 experimentos, suas duas coleções de logs e o relatório foram incluídos em `cb6d5f6`. As correções da revisão estão implementadas e verificadas localmente na branch `codex/correcoes-relatorio-ep1`, sobre `cb6d5f6`. As correções foram registradas em `884d7f5` e publicadas somente em `origin/codex/correcoes-relatorio-ep1`. O push retornou código 0; não houve merge, e `main` local/remota permaneceu em `cb6d5f6`. Este registro documental acompanha a publicação das correções na mesma branch; identifica o commit `884d7f5`, sem atribuir um hash ao próprio registro. A revisão independente final do conjunto foi aprovada em conformidade e qualidade, sem achados pendentes. O [histórico](HISTORICO.md) distingue as verificações anteriores das verificações desta correção.
 
 ## Executar o escalonador
 

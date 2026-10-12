@@ -1,7 +1,7 @@
 # Histórico e acompanhamento do EP1
 
-Última conferência documental: **2026-10-11**, base Git `cb6d5f6`, branch local
-`codex/correcoes-relatorio-ep1`.
+Última conferência documental: **2026-10-11**, base das correções `cb6d5f6`,
+commit das correções `884d7f5`, branch `codex/correcoes-relatorio-ep1`.
 
 A execução principal integrada está registrada em `bf093f1`, integrada à `main`
 e publicada conforme o registro da sexta etapa abaixo. O commit `cb6d5f6`
@@ -11,10 +11,13 @@ interpretação do relatório e documentação desatualizada; o usuário autoriz
 as correções do [plano específico](docs/superpowers/plans/2026-10-11-correcoes-revisao-relatorio.md).
 
 As correções estão implementadas, verificadas e revisadas localmente sobre
-`cb6d5f6`. O usuário autorizou commit das alterações e push somente da branch
-`codex/correcoes-relatorio-ep1`; as operações ainda estão pendentes. Merge e
-alteração da `main` estão proibidos neste pedido, sem hash ou publicação
-antecipados. O coordenador aprovou 127 testes Rust e
+`cb6d5f6` e registradas no commit `884d7f5` (`fix: correct EP1 report and preserve
+log targets`), com 17 arquivos. O coordenador publicou somente a branch
+`codex/correcoes-relatorio-ep1`, com push de código 0 e confirmação remota do
+commit. Não houve merge; `main` local e remota permaneceram em `cb6d5f6`. Este
+registro documental acompanha a publicação das correções na mesma branch;
+identifica `884d7f5`, sem atribuir um hash ao próprio registro.
+O coordenador aprovou 127 testes Rust e
 24 testes Python, zero falhas e zero ignorados; check, fmt, Clippy, build,
 py_compile, geração PDF/TEX e conferência de whitespace aprovados. As 15
 reexecuções oficiais conferem com ambas as coleções de logs; 54 arquivos
@@ -23,8 +26,7 @@ do snapshot anterior foram aprovadas em conformidade e qualidade, sem achados;
 a reavaliação do relatório e a revisão independente final foram aprovadas
 em conformidade e qualidade, sem achados pendentes. A compilação TEX não foi
 verificada por falha de infraestrutura do editor; o PDF final foi inspecionado.
-Experimentos e relatório já existem. Os próximos passos são registrar e
-publicar somente a branch autorizada, manter `main` intacta, conferir o material
+Experimentos e relatório já existem. Os próximos passos são manter `main` intacta, conferir o material
 e preparar o ZIP; prazo e eventual submissão ficam a confirmar
 com a disciplina, sem submissão registrada nesta entrega.
 
@@ -191,8 +193,8 @@ pertencem àquelas etapas, não à correção local atual.
 - [x] Verificar correções Rust, gerador, 15 reexecuções oficiais e PDF final;
   resultados específicos registrados abaixo.
 - [x] Concluir revisão independente final das correções autorizadas: conformidade e qualidade aprovadas, sem achados pendentes.
-- [ ] Criar commit e realizar push somente de `codex/correcoes-relatorio-ep1`,
-  conforme autorização, sem merge ou alteração da `main`.
+- [x] Registrar as correções em `884d7f5` e publicar somente
+  `codex/correcoes-relatorio-ep1`, sem merge ou alteração da `main`.
 - [ ] Conferir material e preparar o ZIP de código, logs e PDF conforme o enunciado,
   após autorização para empacotamento.
 - [ ] Confirmar com a disciplina a situação administrativa do prazo de 04/10/2026
@@ -234,6 +236,7 @@ proposta de validação, não uma funcionalidade adicional prometida.
 | 2026-10-11 | `cb6d5f6` | Inclusão dos 15 experimentos, duas coleções de logs, gerador e relatório TEX/PDF. |
 | 2026-10-11 | Trabalho local sem commit sobre `cb6d5f6` | Correções autorizadas implementadas na branch `codex/correcoes-relatorio-ep1`: publicação preservando alvos de links, dados validados e conteúdo único PDF/TEX via ReportLab, argumentação e documentação corrigidas. Coordenador: Rust127/0/0, Python24/0/0, checks, geração e PDF aprovados; 15 reexecuções idênticas e 54 protegidos intactos. Revisão independente final aprovada em conformidade e qualidade, sem achados pendentes; compilação TEX não verificada por infraestrutura. Sem commit, merge ou push. |
 | 2026-10-11 | Autorização sobre `cb6d5f6` | Usuário autorizou commit das correções e push somente de `codex/correcoes-relatorio-ep1`, proibindo merge e alteração da `main`. Operações ainda pendentes; sem hash ou publicação antecipados. |
+| 2026-10-11 | `884d7f5` | Correções registradas em 17 arquivos e publicadas somente em `origin/codex/correcoes-relatorio-ep1`; push retornou código 0 e consulta remota confirmou o commit. Sem merge; `main` local/remota permaneceu em `cb6d5f6`. |
 
 Verificação da entrega `748077f`: `cargo check --all-targets`, `cargo fmt --check`,
 `cargo clippy --all-targets -- -D warnings` e `git diff --check` aprovados;
@@ -552,8 +555,8 @@ validada no diretório do projeto com `cargo run --bin Escalonador`: quantum 3,
 
 Correções autorizadas e implementadas localmente na branch
 `codex/correcoes-relatorio-ep1`, sobre `cb6d5f6`. Após a revisão, o usuário
-autorizou commit e push somente dessa branch, ainda pendentes; merge e alteração
-da `main` estão proibidos. A revisão independente da publicação de logs foi aprovada;
+autorizou commit e push somente dessa branch, concluídos para as correções em
+`884d7f5`; não houve merge ou alteração da `main`. A revisão independente da publicação de logs foi aprovada;
 a revisão documental do snapshot anterior foi aprovada em conformidade e
 qualidade, sem achados. A reavaliação das correções do relatório e a revisão
 final do conjunto foram aprovadas em conformidade e qualidade, sem achados
@@ -603,11 +606,18 @@ Não houve instalação TeX, empacotamento ZIP ou submissão registrada.
 Fechamento da revisão independente final: conformidade e qualidade aprovadas,
 sem achados críticos, importantes ou menores pendentes. As duas ressalvas P3
 da revisão inicial do relatório foram corrigidas e confirmadas na reavaliação.
-O estado é implementado, verificado e revisado localmente. Commit e push somente
-da branch `codex/correcoes-relatorio-ep1` foram autorizados e ainda estão
-pendentes; `main` deve permanecer intacta, sem merge. Depois, permanecem
-conferência/empacotamento e confirmação administrativa do prazo e eventual
-submissão, além da limitação TEX registrada.
+O estado das correções é implementado, verificado, revisado e publicado somente
+na branch `codex/correcoes-relatorio-ep1`, no commit `884d7f5`, sem merge ou
+alteração da `main`. O push autorizado (`git push -u origin
+HEAD:refs/heads/codex/correcoes-relatorio-ep1`) retornou código 0; a consulta
+remota confirmou a branch em `884d7f5eac59d732f443f1e5a8da91b3b96bce6c` e
+`main` em `cb6d5f6f74545f3f86c6e8a626a483fa26d5f53e`, iguais às referências
+local/remota da `main`. A árvore estava limpa antes deste registro documental.
+Não houve nova execução de testes neste fechamento: permanecem as evidências
+127 Rust/24 Python acima. Este registro documental acompanha a publicação das
+correções na mesma branch; identifica `884d7f5`, sem atribuir um hash ao próprio
+registro. Permanecem conferência/empacotamento e confirmação administrativa
+do prazo e eventual submissão, além da limitação TEX registrada.
 
 ## Como manter
 

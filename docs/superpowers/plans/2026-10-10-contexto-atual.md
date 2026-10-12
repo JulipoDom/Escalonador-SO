@@ -2,7 +2,7 @@
 
 > **Para agentes:** consultar o pedido autorizado, o [plano das correções](2026-10-11-correcoes-revisao-relatorio.md) e o [HISTORICO](../../../HISTORICO.md) antes de implementar. Usar execução delegada e revisão independente conforme [AGENTS](../../../AGENTS.md), com um autor por arquivo. As verificações de etapas anteriores não substituem as da entrega atual.
 
-**Base:** `cb6d5f6`; branch local `codex/correcoes-relatorio-ep1`. A sexta etapa está registrada em `bf093f1`, integrada à `main` e publicada conforme o histórico. Os experimentos e o relatório existem desde `cb6d5f6`. A correção atual foi autorizada, implementada, verificada e revisada localmente. O usuário autorizou commit das alterações e push somente da branch `codex/correcoes-relatorio-ep1`; as operações ainda estão pendentes, sem hash ou publicação antecipados. Merge e alteração da `main` estão proibidos neste pedido.
+**Base:** `cb6d5f6`; branch local `codex/correcoes-relatorio-ep1`. A sexta etapa está registrada em `bf093f1`, integrada à `main` e publicada conforme o histórico. Os experimentos e o relatório existem desde `cb6d5f6`. A correção atual foi autorizada, implementada, verificada e revisada localmente. O commit `884d7f5` registra as correções e foi publicado somente em `origin/codex/correcoes-relatorio-ep1`, com push de código 0. Não houve merge; `main` local/remota permaneceu em `cb6d5f6`. Este registro documental acompanha a publicação das correções na mesma branch; identifica o commit `884d7f5`, sem atribuir um hash ao próprio registro.
 
 **Arquitetura:** a tabela possui os BCPs e as filas guardam somente `ProcessId`. Interpretador, quantum, política de créditos e operações de E/S são consumidos pelo passo e por `executar_laco` até a conclusão. `simular` integra eventos, estatísticas e registradores finais reais; `main` carrega e valida entradas antes de publicar o log no diretório corrente.
 
@@ -47,7 +47,7 @@ O TEX está aberto no editor, mas a compilação integrada não foi verificada: 
 
 ## Próximos passos
 
-- [ ] Registrar as alterações em commit e publicar somente `codex/correcoes-relatorio-ep1`, conforme autorização; manter `main` intacta e não realizar merge.
+- [x] Registrar as correções em `884d7f5` e publicar somente `codex/correcoes-relatorio-ep1`, sem merge e com `main` intacta.
 
 - [x] Executar verificações da implementação, geração e PDF; resultados registrados no HISTORICO.
 - [x] Concluir revisão independente final das correções autorizadas: conformidade e qualidade aprovadas, sem achados pendentes.

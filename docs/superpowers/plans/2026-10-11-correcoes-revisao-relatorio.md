@@ -69,6 +69,8 @@
 - [x] Abrir TEX no editor e usar compilador integrado; corrigir erros nos limites da ferramenta. PDF de entrega gerado pelo gerador documentado; inspecionar todas páginas após última geração.
 - [x] Revisão final do conjunto, estados/documentação atualizados e PDF apresentado ao usuário; sem operações Git de publicação.
 
-Estado de verificação: Rust127/0/0 e Python24/0/0; checks e QA PDF7páginas aprovados. Compilação TEX tentada no editor e não verificada por falta do bundle/cache e falha de download, sem diagnóstico de fonte. Revisão final do conjunto aprovada em conformidade e qualidade, sem achados pendentes; publicação desta branch autorizada, ainda pendente; sem merge na main.
+Estado de verificação: Rust127/0/0 e Python24/0/0; checks e QA PDF7páginas aprovados. Compilação TEX tentada no editor e não verificada por falta do bundle/cache e falha de download, sem diagnóstico de fonte. Revisão final do conjunto aprovada em conformidade e qualidade, sem achados pendentes; correções publicadas no commit `884d7f5` em `origin/codex/correcoes-relatorio-ep1`; sem merge na main.
 
 Autorização de integração Git: o usuário pediu commit das correções e push de `codex/correcoes-relatorio-ep1`, sem merge e sem alterar `main`. Verificar o commit e o ref remoto antes de registrar publicação concluída.
+
+Publicação verificada: commit `884d7f5` (`fix: correct EP1 report and preserve log targets`) criado com 17 arquivos e publicado em `origin/codex/correcoes-relatorio-ep1` (push código 0). A consulta aos refs remotos confirmou esse commit na branch e `main` em `cb6d5f6`; a main local e origin/main também permanecem em `cb6d5f6`. Esta atualização documental registra fatos da publicação já concluída, sem antecipar seu próprio commit.
