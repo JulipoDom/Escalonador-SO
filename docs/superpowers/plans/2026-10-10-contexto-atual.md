@@ -2,7 +2,7 @@
 
 > **Para agentes:** consultar o pedido autorizado, o [plano das correções](2026-10-11-correcoes-revisao-relatorio.md) e o [HISTORICO](../../../HISTORICO.md) antes de implementar. Usar execução delegada e revisão independente conforme [AGENTS](../../../AGENTS.md), com um autor por arquivo. As verificações de etapas anteriores não substituem as da entrega atual.
 
-**Base:** `cb6d5f6`; branch local `codex/correcoes-relatorio-ep1`. A sexta etapa está registrada em `bf093f1`, integrada à `main` e publicada conforme o histórico. Os experimentos e o relatório existem desde `cb6d5f6`. A correção atual foi autorizada, implementada, verificada e revisada localmente. O commit `884d7f5` registra as correções e foi publicado somente em `origin/codex/correcoes-relatorio-ep1`, com push de código 0. Não houve merge; `main` local/remota permaneceu em `cb6d5f6`. Este registro documental acompanha a publicação das correções na mesma branch; identifica o commit `884d7f5`, sem atribuir um hash ao próprio registro.
+**Base:** `884d7f5`, branch `codex/correcoes-relatorio-ep1`, publicada sobre `cb6d5f6`. As seis etapas, os experimentos e o relatório estão implementados. O pedido vigente autoriza obter a branch nova, validar o projeto e integrá-la à `main` se estiver correta. A conferência atual aprovou testes, reexecuções oficiais e duas revisões independentes, sem achados bloqueantes. Consulte o HISTORICO para as evidências atuais e as limitações de geração PDF/compilação TEX.
 
 **Arquitetura:** a tabela possui os BCPs e as filas guardam somente `ProcessId`. Interpretador, quantum, política de créditos e operações de E/S são consumidos pelo passo e por `executar_laco` até a conclusão. `simular` integra eventos, estatísticas e registradores finais reais; `main` carrega e valida entradas antes de publicar o log no diretório corrente.
 
@@ -39,7 +39,7 @@ Preservar byte a byte as 12 entradas oficiais, `ep1.pdf`, os 30 logs versionados
 - Reexecutar os 15 quantums em cópias temporárias e comparar logs byte a byte; conferir entradas, PDF do enunciado e acervo contra a base. Não gerar logs experimentais na raiz durante essas verificações.
 - Inspecionar todas as páginas do PDF após a última geração, abrir TEX no editor e conferir compilação integrada. Registrar o resultado real, inclusive limitações ou falhas.
 
-## Verificações desta correção
+## Verificações históricas da correção
 
 O coordenador aprovou check, fmt, Clippy, build e a suíte Rust com 127 aprovados, zero falhas e zero ignorados; seis testes de lib e 121 de integração, zero testes de main/doctests. As 15 reexecuções oficiais em cópias temporárias tiveram código 0, streams vazios e logs idênticos às duas coleções; cópias e 54 arquivos protegidos preservados, sem temporários residuais. Python: 24 testes aprovados, zero falhas/ignorados, py_compile e geração de PDF/TEX a partir de `/tmp` aprovados. Todas as sete páginas A4 do PDF foram rasterizadas e inspecionadas, com fontes Vera Roman/Bold efetivamente usadas incorporadas e gráficos sem sobreposição. `git diff --check` aprovado. Revisão da publicação de logs e revisão documental do snapshot anterior aprovadas em conformidade e qualidade, sem achados; reavaliação do relatório e revisão independente final aprovadas em conformidade e qualidade, sem achados pendentes.
 
@@ -47,11 +47,13 @@ O TEX está aberto no editor, mas a compilação integrada não foi verificada: 
 
 ## Próximos passos
 
-- [x] Registrar as correções em `884d7f5` e publicar somente `codex/correcoes-relatorio-ep1`, sem merge e com `main` intacta.
+- [x] Publicar as correções na branch `codex/correcoes-relatorio-ep1`: commit `884d7f5`.
+- [x] Revalidar a branch publicada: 127 testes Rust, 24 Python, 15 reexecuções, TEX e PDF existente conferidos; revisões independentes aprovadas.
+- [ ] Integrar à `main` conforme autorização vigente, preservando as limitações registradas no HISTORICO.
 
 - [x] Executar verificações da implementação, geração e PDF; resultados registrados no HISTORICO.
 - [x] Concluir revisão independente final das correções autorizadas: conformidade e qualidade aprovadas, sem achados pendentes.
 - [ ] Conferir o material final e preparar o ZIP com código, logs e PDF conforme o enunciado, após autorização para empacotamento.
 - [ ] Confirmar com a disciplina a situação administrativa do prazo de 04/10/2026 e eventual submissão; nenhuma submissão está registrada nesta entrega.
 
-Novas capacidades e operações Git além do commit/push da branch autorizada exigem pedido próprio. Os relatos históricos no HISTORICO descrevem o estado de cada entrega à época; não são pendências atuais.
+Novas capacidades exigem pedido próprio; o merge na main está autorizado no pedido vigente. Os relatos históricos no HISTORICO descrevem o estado de cada entrega à época; não são pendências atuais.

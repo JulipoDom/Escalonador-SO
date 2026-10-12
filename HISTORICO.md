@@ -1,34 +1,37 @@
 # Histórico e acompanhamento do EP1
 
-Última conferência documental: **2026-10-11**, base das correções `cb6d5f6`,
-commit das correções `884d7f5`, branch `codex/correcoes-relatorio-ep1`.
+Última conferência documental: **2026-10-11**, base Git `884d7f5`, branch
+`codex/correcoes-relatorio-ep1`.
 
-A execução principal integrada está registrada em `bf093f1`, integrada à `main`
-e publicada conforme o registro da sexta etapa abaixo. O commit `cb6d5f6`
-incluiu 15 experimentos, os 30 logs das duas coleções, o gerador e o relatório
-TEX/PDF. A revisão identificou problemas de publicação sobre links, geração e
-interpretação do relatório e documentação desatualizada; o usuário autorizou
-as correções do [plano específico](docs/superpowers/plans/2026-10-11-correcoes-revisao-relatorio.md).
+A execução principal integrada está registrada em `bf093f1`; `cb6d5f6` incluiu
+os 15 experimentos, os 30 logs, o gerador e o relatório TEX/PDF. As correções
+da revisão estão publicadas em `884d7f5`. O pedido vigente autoriza obter a
+branch nova, verificar o projeto e integrar à `main` se estiver correto,
+substituindo a restrição anterior de publicar somente a branch.
 
-As correções estão implementadas, verificadas e revisadas localmente sobre
-`cb6d5f6` e registradas no commit `884d7f5` (`fix: correct EP1 report and preserve
-log targets`), com 17 arquivos. O coordenador publicou somente a branch
-`codex/correcoes-relatorio-ep1`, com push de código 0 e confirmação remota do
-commit. Não houve merge; `main` local e remota permaneceram em `cb6d5f6`. Este
-registro documental acompanha a publicação das correções na mesma branch;
-identifica `884d7f5`, sem atribuir um hash ao próprio registro.
-O coordenador aprovou 127 testes Rust e
-24 testes Python, zero falhas e zero ignorados; check, fmt, Clippy, build,
-py_compile, geração PDF/TEX e conferência de whitespace aprovados. As 15
-reexecuções oficiais conferem com ambas as coleções de logs; 54 arquivos
-protegidos intactos. A revisão da publicação de logs e a revisão documental
-do snapshot anterior foram aprovadas em conformidade e qualidade, sem achados;
-a reavaliação do relatório e a revisão independente final foram aprovadas
-em conformidade e qualidade, sem achados pendentes. A compilação TEX não foi
-verificada por falha de infraestrutura do editor; o PDF final foi inspecionado.
-Experimentos e relatório já existem. Os próximos passos são manter `main` intacta, conferir o material
-e preparar o ZIP; prazo e eventual submissão ficam a confirmar
-com a disciplina, sem submissão registrada nesta entrega.
+A conferência atual aprovou 127 testes Rust e 24 testes Python, zero falhas e
+zero ignorados, além de check, fmt, Clippy, build release e whitespace.
+As 15 reexecuções release em diretórios temporários produziram logs idênticos
+às duas coleções versionadas; os 12 arquivos oficiais conferem byte a byte com
+o ZIP original. A coleta e a validação de todos os eventos foram reexecutadas;
+o TEX regenerado é idêntico ao versionado. O PDF existente foi rasterizado e
+inspecionado nas sete páginas A4. Duas revisões independentes, do núcleo Rust
+e do relatório, não encontraram problemas bloqueantes.
+
+Limites desta conferência: ReportLab está ausente e a instalação em `/tmp`
+não encontrou distribuição disponível no ambiente; a geração do PDF não foi
+reexecutada. A compilação TEX também não foi verificada. Isso não altera as
+verificações históricas de geração registradas abaixo. O artefato PDF
+existente, seu conteúdo e os dados foram conferidos nesta revisão.
+
+O Git por SSH não conseguiu acessar o remoto: configuração SSH com permissões
+inválidas e, após ignorar essa configuração, falha de resolução de github.com.
+A branch foi obtida pelo conector GitHub, com blobs, árvores e commits
+validados pelos hashes originais, preservando a versão local anterior em
+`backup/main-antes-revisao-20261011`. O histórico importado é raso em `cb6d5f6`.
+A integração autorizada será feita pelo conector, após as verificações.
+Conferência/empacotamento do ZIP e eventual submissão permanecem fora deste
+pedido, sem submissão registrada.
 
 Os registros históricos abaixo preservam commits, verificações e pendências
 do momento de cada entrega. As etapas anteriores estão em `7b92a6a`, `8d4d172`,
@@ -44,8 +47,8 @@ créditos e operações de espera de E/S; a terceira integra despacho, transiç�
 ociosidade em um passo; a quarta completa o laço do núcleo até a conclusão; a
 quinta integra estatísticas e logs reais na API `simular`; a sexta integra essa API
 em `main`, usando o carregador e o escritor existentes. Os experimentos e o
-relatório estão incluídos em `cb6d5f6`; o trabalho autorizado atual corrige os
-achados da revisão, sem ampliar as capacidades do escalonador.
+relatório estão incluídos em `cb6d5f6`; o pedido vigente verifica as correções
+e autoriza sua integração à main, sem ampliar as capacidades do escalonador.
 
 ## Estado atual por módulo
 
@@ -618,6 +621,14 @@ Não houve nova execução de testes neste fechamento: permanecem as evidências
 correções na mesma branch; identifica `884d7f5`, sem atribuir um hash ao próprio
 registro. Permanecem conferência/empacotamento e confirmação administrativa
 do prazo e eventual submissão, além da limitação TEX registrada.
+
+## Nova conferência para integração — 2026-10-11
+
+O usuário autorizou substituir a versão local pela branch publicada `884d7f5`
+e integrar à `main` após validação. A conferência e as duas revisões independentes
+foram aprovadas conforme o resumo atual acima. Nenhuma alteração de código,
+entrada, log ou relatório foi necessária; somente o estado documental foi
+atualizado para refletir a autorização e os limites desta rodada.
 
 ## Como manter
 
